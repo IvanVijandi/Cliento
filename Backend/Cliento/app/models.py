@@ -8,7 +8,7 @@ class ProfesionalManager(BaseUserManager):
             raise ValueError("El email es obligatorio")
         email = self.normalize_email(email)
         profesional = self.model(email=email, **extra_fields)
-        profesional.set_password(password)
+        profesional.set_password(password) ##Hashea la contraseña
         profesional.save()
         return profesional
 
@@ -31,7 +31,7 @@ class Profesional(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    objects = ProfesionalManager() ##Sobreescribimos el manager para que ProfesionalManager
+    objects = ProfesionalManager() ##Reescribo el objects de Profesional para usar Authenticate
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nombre', 'apellido', 'matricula']

@@ -5,6 +5,7 @@ from .serializers import ProfesionalSerializer, EspecialidadSerializer, Consulto
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 
+
 ##Clases de Vista viewsets | son como los controladores de Django pero para API REST
 ##Ya nos da PUT/DELETE/GET/POST
 
@@ -54,7 +55,18 @@ class LoginView(APIView):
         user = authenticate(request, email=email, password=password)
             
         if user is not None:
-            return Response({' Usuario  encontrado'})
+            
+            return Response({
+                'id': user.id,
+                'email': user.email,
+                'nombre': user.nombre,
+                'apellido': user.apellido,
+                'matricula': user.matricula,
+                'especialidades': [esp.nombre for esp in user.especialidades.all()],
+                'terapeuta': user.terapeuta,
+                'psiquiatra': user.psiquiatra,
+                'psicologo': user.psicologo
+            })
         else:
             return Response({'error': 'Invalid credentials'})
 
