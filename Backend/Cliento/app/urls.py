@@ -1,6 +1,11 @@
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
+##Vistas de modelos
 from .views import Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha, Profesional
+##Vistas de autenticacion
+from .views import LoginView
+
+
 router = DefaultRouter()
 router.register(r'profesional', Profesional, basename='profesional')
 router.register(r'especialidad', Especialidad, basename='especialidad') 
@@ -13,6 +18,8 @@ router.register(r'ficha', Ficha, basename='ficha')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('login/', LoginView.as_view(), name='login'),
+
 ]
 
 

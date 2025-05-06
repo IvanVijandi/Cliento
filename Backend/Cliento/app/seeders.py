@@ -7,8 +7,8 @@ def run():
     especialidad2 = Especialidad.objects.create(nombre="Psiquiatría", descripcion="Especialidad en psiquiatría")
 
     # Crear profesionales
-    profesional1 = Profesional.objects.create(nombre="Juan", apellido="Pérez", matricula="12345", terapeuta=True)
-    profesional2 = Profesional.objects.create(nombre="Ana", apellido="Gómez", matricula="67890", psiquiatra=True)
+    profesional1 = Profesional.objects.create_user(nombre="Juan",email="juan@gmail.com",password="12345678", apellido="Pérez", matricula="12345", terapeuta=True)
+    profesional2 = Profesional.objects.create_user(nombre="Ana",email="Ana@gmail.com",password="12345678", apellido="Gómez", matricula="67890", psiquiatra=True)
 
     # Asociar especialidades a profesionales
     profesional1.especialidades.add(especialidad1)

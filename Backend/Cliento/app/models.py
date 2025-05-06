@@ -1,19 +1,42 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 
-class Profesional(models.Model):
-    id = models.AutoField(primary_key=True)
+class ProfesionalManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("El email es obligatorio")
+        email = self.normalize_email(email)
+        profesional = self.model(email=email, **extra_fields)
+        profesional.set_password(password)
+        profesional.save()
+        return profesional
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
+
+class Profesional(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    contrasena = models.CharField(max_length=100)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     matricula = models.CharField(max_length=100, unique=True)
-    especialidades = models.ManyToManyField('Especialidad', related_name='profesionales')
-    #Campos booleanos
+    especialidades = models.ManyToManyField('Especialidad', related_name='profesionales', blank=True)
+
     terapeuta = models.BooleanField(default=False)
     psiquiatra = models.BooleanField(default=False)
     psicologo = models.BooleanField(default=False)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = ProfesionalManager() ##Sobreescribimos el manager para que ProfesionalManager
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['nombre', 'apellido', 'matricula']
+
+
 
 class Especialidad(models.Model):
     id = models.AutoField(primary_key=True)
@@ -34,7 +57,6 @@ class Paciente(models.Model):
     fecha_nacimiento = models.DateField()
     telefono = models.CharField(max_length=20)
     email = models.EmailField()
-    contrasena = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
     altura = models.FloatField()
     peso = models.FloatField()

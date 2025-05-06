@@ -2,9 +2,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Profesional, Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha
 from .serializers import ProfesionalSerializer, EspecialidadSerializer, ConsultorioSerializer, PacienteSerializer, ConsultaSerializer, TrastornoSerializer, DrogaSerializer, FichaSerializer
-from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from rest_framework import status   
+from rest_framework.views import APIView
 
 ##Clases de Vista viewsets | son como los controladores de Django pero para API REST
 ##Ya nos da PUT/DELETE/GET/POST
@@ -14,7 +13,6 @@ from rest_framework import status
 class Profesional(viewsets.ModelViewSet):
     queryset = Profesional.objects.all() ##url base
     serializer_class = ProfesionalSerializer
-    
     
 
 class Especialidad(viewsets.ModelViewSet):
@@ -45,41 +43,20 @@ class Ficha(viewsets.ModelViewSet):
     queryset = Ficha.objects.all()
     serializer_class = FichaSerializer  
 
+
 ##VISTA DE AUTENTICACION
 
-class LoginView(viewsets.ViewSet):
-    def post(self, request):
+class LoginView(APIView):
+    def post(self,request):
         email = request.data.get('email')
-        contrasena = request.data.get('contrasena')
+        password = request.data.get('password')
+            
+        user = authenticate(request, email=email, password=password)
+            
+        if user is not None:
+            return Response({' Usuario  encontrado'})
+        else:
+            return Response({'error': 'Invalid credentials'})
 
-        # Validar que se proporcionen las credenciales
-        if not email or not contrasena:
-            return Response(
-                {"error": "Se deben proporcionar el correo y la contraseña."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
-        # Autenticar al usuario
-        profesional = authenticate(username=email, password=contrasena)
-        if profesional is None:
-            return Response(
-                {"error": "Credenciales incorrectas."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        # Generar o recuperar el token del usuario
-        token, created = Token.objects.get_or_create(user=profesional)
-
-        # Devolver el token y los datos del usuario
-        return Response(
-            {
-                "token": token.key,
-                "user": {
-                    "id": profesional.id,
-                    "email": profesional.email,
-                    "nombre": profesional.nombre,
-                    "apellido": profesional.apellido,
-                },
-            },
-            status=status.HTTP_200_OK,
-        )
+  
