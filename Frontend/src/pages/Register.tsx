@@ -1,32 +1,26 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Brain, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Brain, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
-import Input from "../components/ui/Input";
-import Button from "../components/ui/Button";
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
+import Input from '../components/ui/Input';
+import Button from '../components/ui/Button';
 
-// Definir esquema para la validación del formulario
-const registerSchema = z
-  .object({
-    firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-    lastName: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
-    email: z
-      .string()
-      .email("Por favor, introduce una dirección de correo válida"),
-    password: z
-      .string()
-      .min(8, "La contraseña debe tener al menos 8 caracteres"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  });
+// Define schema for form validation
+const registerSchema = z.object({
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword']
+});
 
 type RegisterFormData = {
   firstName: string;
@@ -41,62 +35,54 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+  
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema)
   });
 
-  const password = watch("password", "");
-
+  const password = watch('password', '');
+  
   const passwordStrength = {
     hasLength: password.length >= 8,
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasNumber: /[0-9]/.test(password),
-    hasSpecial: /[^A-Za-z0-9]/.test(password),
+    hasSpecial: /[^A-Za-z0-9]/.test(password)
   };
-
+  
   const getPasswordStrengthScore = () => {
     return Object.values(passwordStrength).filter(Boolean).length;
   };
-
+  
   const score = getPasswordStrengthScore();
-
+  
   const getStrengthColor = () => {
-    if (score <= 2) return "bg-error";
-    if (score <= 4) return "bg-warning";
-    return "bg-success";
+    if (score <= 2) return 'bg-error';
+    if (score <= 4) return 'bg-warning';
+    return 'bg-success';
   };
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      // Simulando llamada a la API
-      console.log("Datos de registro:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Guardar datos del usuario en localStorage (en una app real, usarías tokens)
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: "1",
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          role: "practitioner",
-        })
-      );
-
-      // Redirigir al panel de control
-      navigate("/dashboard");
+      // Simulating API call
+      console.log('Registration data:', data);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Store user data in localStorage (in a real app, you would use tokens)
+      localStorage.setItem('user', JSON.stringify({
+        id: '1',
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        role: 'practitioner'
+      }));
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
     } catch (error) {
-      console.error("Error al registrarse:", error);
-      alert("El registro falló. Por favor, inténtalo de nuevo.");
+      console.error('Registration error:', error);
+      alert('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +91,7 @@ const Register: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-
+      
       <main className="flex-grow flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 animate-fade-in">
           <div className="text-center">
@@ -114,63 +100,58 @@ const Register: React.FC = () => {
                 <Brain className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Crea tu cuenta
-            </h2>
+            <h2 className="mt-6 text-3xl font-bold text-gray-900">Create your account</h2>
             <p className="mt-2 text-sm text-gray-600">
-              ¿Ya tienes una cuenta?{" "}
-              <Link
-                to="/login"
-                className="font-medium text-primary hover:text-primary-dark transition-colors"
-              >
-                Inicia sesión
+              Already have an account?{' '}
+              <Link to="/login" className="font-medium text-primary hover:text-primary-dark transition-colors">
+                Sign in
               </Link>
             </p>
           </div>
-
+          
           <div className="bg-white p-8 rounded-lg shadow-sm">
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Nombre"
+                  label="First name"
                   type="text"
                   id="firstName"
                   autoComplete="given-name"
-                  placeholder="Juan"
+                  placeholder="John"
                   error={errors.firstName?.message}
-                  {...register("firstName")}
+                  {...register('firstName')}
                 />
-
+                
                 <Input
-                  label="Apellido"
+                  label="Last name"
                   type="text"
                   id="lastName"
                   autoComplete="family-name"
-                  placeholder="Pérez"
+                  placeholder="Doe"
                   error={errors.lastName?.message}
-                  {...register("lastName")}
+                  {...register('lastName')}
                 />
               </div>
-
+              
               <Input
-                label="Correo electrónico"
+                label="Email address"
                 type="email"
                 id="email"
                 autoComplete="email"
-                placeholder="tu@ejemplo.com"
+                placeholder="you@example.com"
                 error={errors.email?.message}
-                {...register("email")}
+                {...register('email')}
               />
-
+              
               <div className="relative">
                 <Input
-                  label="Contraseña"
-                  type={showPassword ? "text" : "password"}
+                  label="Password"
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   autoComplete="new-password"
                   placeholder="••••••••"
                   error={errors.password?.message}
-                  {...register("password")}
+                  {...register('password')}
                 />
                 <button
                   type="button"
@@ -185,141 +166,51 @@ const Register: React.FC = () => {
                   )}
                 </button>
               </div>
-
+              
               {password.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex space-x-1 h-1">
-                    <div
-                      className={`flex-1 rounded-l ${
-                        score >= 1 ? getStrengthColor() : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`flex-1 ${
-                        score >= 2 ? getStrengthColor() : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`flex-1 ${
-                        score >= 3 ? getStrengthColor() : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`flex-1 ${
-                        score >= 4 ? getStrengthColor() : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`flex-1 rounded-r ${
-                        score >= 5 ? getStrengthColor() : "bg-gray-200"
-                      }`}
-                    ></div>
+                    <div className={`flex-1 rounded-l ${score >= 1 ? getStrengthColor() : 'bg-gray-200'}`}></div>
+                    <div className={`flex-1 ${score >= 2 ? getStrengthColor() : 'bg-gray-200'}`}></div>
+                    <div className={`flex-1 ${score >= 3 ? getStrengthColor() : 'bg-gray-200'}`}></div>
+                    <div className={`flex-1 ${score >= 4 ? getStrengthColor() : 'bg-gray-200'}`}></div>
+                    <div className={`flex-1 rounded-r ${score >= 5 ? getStrengthColor() : 'bg-gray-200'}`}></div>
                   </div>
-
+                  
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="flex items-center">
-                      <CheckCircle2
-                        className={`h-3.5 w-3.5 mr-1 ${
-                          passwordStrength.hasLength
-                            ? "text-success"
-                            : "text-gray-300"
-                        }`}
-                      />
-                      <span
-                        className={
-                          passwordStrength.hasLength
-                            ? "text-gray-700"
-                            : "text-gray-400"
-                        }
-                      >
-                        8+ caracteres
-                      </span>
+                      <CheckCircle2 className={`h-3.5 w-3.5 mr-1 ${passwordStrength.hasLength ? 'text-success' : 'text-gray-300'}`} />
+                      <span className={passwordStrength.hasLength ? 'text-gray-700' : 'text-gray-400'}>8+ characters</span>
                     </div>
                     <div className="flex items-center">
-                      <CheckCircle2
-                        className={`h-3.5 w-3.5 mr-1 ${
-                          passwordStrength.hasUppercase
-                            ? "text-success"
-                            : "text-gray-300"
-                        }`}
-                      />
-                      <span
-                        className={
-                          passwordStrength.hasUppercase
-                            ? "text-gray-700"
-                            : "text-gray-400"
-                        }
-                      >
-                        Mayúscula
-                      </span>
+                      <CheckCircle2 className={`h-3.5 w-3.5 mr-1 ${passwordStrength.hasUppercase ? 'text-success' : 'text-gray-300'}`} />
+                      <span className={passwordStrength.hasUppercase ? 'text-gray-700' : 'text-gray-400'}>Uppercase</span>
                     </div>
                     <div className="flex items-center">
-                      <CheckCircle2
-                        className={`h-3.5 w-3.5 mr-1 ${
-                          passwordStrength.hasLowercase
-                            ? "text-success"
-                            : "text-gray-300"
-                        }`}
-                      />
-                      <span
-                        className={
-                          passwordStrength.hasLowercase
-                            ? "text-gray-700"
-                            : "text-gray-400"
-                        }
-                      >
-                        Minúscula
-                      </span>
+                      <CheckCircle2 className={`h-3.5 w-3.5 mr-1 ${passwordStrength.hasLowercase ? 'text-success' : 'text-gray-300'}`} />
+                      <span className={passwordStrength.hasLowercase ? 'text-gray-700' : 'text-gray-400'}>Lowercase</span>
                     </div>
                     <div className="flex items-center">
-                      <CheckCircle2
-                        className={`h-3.5 w-3.5 mr-1 ${
-                          passwordStrength.hasNumber
-                            ? "text-success"
-                            : "text-gray-300"
-                        }`}
-                      />
-                      <span
-                        className={
-                          passwordStrength.hasNumber
-                            ? "text-gray-700"
-                            : "text-gray-400"
-                        }
-                      >
-                        Número
-                      </span>
+                      <CheckCircle2 className={`h-3.5 w-3.5 mr-1 ${passwordStrength.hasNumber ? 'text-success' : 'text-gray-300'}`} />
+                      <span className={passwordStrength.hasNumber ? 'text-gray-700' : 'text-gray-400'}>Number</span>
                     </div>
                     <div className="flex items-center col-span-2">
-                      <CheckCircle2
-                        className={`h-3.5 w-3.5 mr-1 ${
-                          passwordStrength.hasSpecial
-                            ? "text-success"
-                            : "text-gray-300"
-                        }`}
-                      />
-                      <span
-                        className={
-                          passwordStrength.hasSpecial
-                            ? "text-gray-700"
-                            : "text-gray-400"
-                        }
-                      >
-                        Carácter especial
-                      </span>
+                      <CheckCircle2 className={`h-3.5 w-3.5 mr-1 ${passwordStrength.hasSpecial ? 'text-success' : 'text-gray-300'}`} />
+                      <span className={passwordStrength.hasSpecial ? 'text-gray-700' : 'text-gray-400'}>Special character</span>
                     </div>
                   </div>
                 </div>
               )}
-
+              
               <div className="relative">
                 <Input
-                  label="Confirmar contraseña"
-                  type={showConfirmPassword ? "text" : "password"}
+                  label="Confirm password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
                   autoComplete="new-password"
                   placeholder="••••••••"
                   error={errors.confirmPassword?.message}
-                  {...register("confirmPassword")}
+                  {...register('confirmPassword')}
                 />
                 <button
                   type="button"
@@ -334,7 +225,7 @@ const Register: React.FC = () => {
                   )}
                 </button>
               </div>
-
+              
               <div>
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
@@ -348,33 +239,31 @@ const Register: React.FC = () => {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="terms" className="text-gray-600">
-                      Acepto los{" "}
-                      <a
-                        href="#"
-                        className="text-primary hover:text-primary-dark"
-                      >
-                        Términos del Servicio
-                      </a>{" "}
-                      y la{" "}
-                      <a
-                        href="#"
-                        className="text-primary hover:text-primary-dark"
-                      >
-                        Política de Privacidad
+                      I agree to the{' '}
+                      <a href="#" className="text-primary hover:text-primary-dark">
+                        Terms of Service
+                      </a>{' '}
+                      and{' '}
+                      <a href="#" className="text-primary hover:text-primary-dark">
+                        Privacy Policy
                       </a>
                     </label>
                   </div>
                 </div>
               </div>
-
-              <Button type="submit" fullWidth isLoading={isLoading}>
-                Crear cuenta
+              
+              <Button
+                type="submit"
+                fullWidth
+                isLoading={isLoading}
+              >
+                Create account
               </Button>
             </form>
           </div>
         </div>
       </main>
-
+      
       <Footer />
     </div>
   );

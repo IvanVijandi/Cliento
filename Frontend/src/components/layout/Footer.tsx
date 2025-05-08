@@ -1,6 +1,6 @@
-import React from "react";
-import { Brain, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Brain, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   return (
@@ -10,169 +10,119 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <Link to="/" className="flex items-center text-primary">
               <Brain className="h-6 w-6 mr-2" />
-              <span className="text-lg font-semibold">Cliento</span>
+              <span className="text-lg font-semibold">MindTrack</span>
             </Link>
             <p className="text-gray-600 text-sm">
-              Empoderando a los profesionales de la salud mental con soluciones
-              inteligentes para la gestión de clientes.
+              Empowering mental health professionals with intelligent client management solutions.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-primary transition-colors"
-              >
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-primary transition-colors"
-              >
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-primary transition-colors"
-              >
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-primary transition-colors"
-              >
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
               </a>
             </div>
           </div>
-
+          
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
-              Funcionalidades
+              Features
             </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Gestión de Clientes
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Client Management
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Programación de Citas
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Appointment Scheduling
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Notas de Sesión
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Session Notes
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Análisis
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Analytics
                 </a>
               </li>
             </ul>
           </div>
-
+          
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
-              Recursos
+              Resources
             </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Centro de Ayuda
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Help Center
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
                   Blog
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Tutoriales
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Tutorials
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Casos de Estudio
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Case Studies
                 </a>
               </li>
             </ul>
           </div>
-
+          
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
-              Compañía
+              Company
             </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Sobre Nosotros
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  About Us
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Carreras
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Careers
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Política de Privacidad
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Privacy Policy
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-600 hover:text-primary transition-colors"
-                >
-                  Términos del Servicio
+                <a href="#" className="text-base text-gray-600 hover:text-primary transition-colors">
+                  Terms of Service
                 </a>
               </li>
             </ul>
           </div>
         </div>
-
+        
         <div className="mt-12 border-t border-gray-200 pt-8">
           <p className="text-base text-gray-500 text-center">
-            &copy; {new Date().getFullYear()} Cliento. Todos los derechos
-            reservados.
+            &copy; {new Date().getFullYear()} MindTrack. All rights reserved.
           </p>
         </div>
       </div>
