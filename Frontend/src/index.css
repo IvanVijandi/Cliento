@@ -4,7 +4,6 @@
 
 .rdp {
   --rdp-cell-size: 40px;
-  /* Increased from default */
   --rdp-accent-color: #22c55e;
   --rdp-background-color: #e2e8f0;
   margin: 0;
@@ -31,4 +30,60 @@
 .rdp-button {
   font-size: 1rem;
   padding: 0.5rem;
+}
+
+/* FullCalendar Customizations */
+.fc {
+  font-family: inherit;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.fc .fc-button {
+  @apply bg-primary text-white border-0 shadow-sm hover:bg-primary-dark focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  @apply bg-primary-dark;
+}
+
+.fc .fc-daygrid-day-number,
+.fc .fc-col-header-cell-cushion {
+  @apply text-gray-700;
+}
+
+.fc .fc-event {
+  @apply cursor-pointer transition-opacity duration-200;
+}
+
+.fc .fc-event:hover {
+  @apply opacity-90;
+}
+
+.fc .fc-timegrid-slot-label {
+  @apply text-sm text-gray-500;
+}
+
+.fc .fc-timegrid-axis-cushion {
+  @apply text-sm text-gray-500;
+}
+
+.fc .fc-timegrid-slot {
+  @apply h-12;
+}
+
+.fc .fc-timegrid-event {
+  @apply rounded-md shadow-sm;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  @apply border-red-500;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  @apply border-red-500;
 }

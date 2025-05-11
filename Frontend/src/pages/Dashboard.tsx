@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Brain,
   Users,
@@ -8,8 +9,10 @@ import {
   MessageSquare,
   Settings,
   LogOut,
+  DollarSign,
 } from "lucide-react";
 import Button from "../components/ui/Button";
+import { Navigate } from "react-router-dom";
 
 const Dashboard: React.FC = () => {
   const appointments = [
@@ -35,7 +38,7 @@ const Dashboard: React.FC = () => {
       type: "Online",
     },
   ];
-
+  const navigate = useNavigate();
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
@@ -52,14 +55,16 @@ const Dashboard: React.FC = () => {
               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
             >
               <Users className="h-5 w-5" />
-              <span>Pacientes</span>
+              <button onClick={() => navigate("/Patients")}>Pacientes</button>
             </a>
             <a
               href="#"
               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
             >
               <Calendar className="h-5 w-5" />
-              <span>Consultas</span>
+              <button onClick={() => navigate("/appointments")}>
+                Consultas
+              </button>
             </a>
             <a
               href="#"
@@ -74,6 +79,13 @@ const Dashboard: React.FC = () => {
             >
               <BarChart2 className="h-5 w-5" />
               <span>Progreso</span>
+            </a>
+            <a
+              href="#"
+              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
+            >
+              <DollarSign className="h-5 w-5" />
+              <span>Pagos</span>
             </a>
             <a
               href="#"
