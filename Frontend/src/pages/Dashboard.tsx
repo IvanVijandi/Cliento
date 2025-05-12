@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Brain,
@@ -12,7 +12,6 @@ import {
   DollarSign,
 } from "lucide-react";
 import Button from "../components/ui/Button";
-import { Navigate } from "react-router-dom";
 
 const Dashboard: React.FC = () => {
   const appointments = [
@@ -38,7 +37,9 @@ const Dashboard: React.FC = () => {
       type: "Online",
     },
   ];
+
   const navigate = useNavigate();
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
@@ -50,61 +51,59 @@ const Dashboard: React.FC = () => {
           </div>
 
           <nav className="space-y-2">
-            <a
-              href="#"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
+            <button
+              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              onClick={() => navigate("/Patients")}
             >
               <Users className="h-5 w-5" />
-              <button onClick={() => navigate("/Patients")}>Pacientes</button>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
+              <span>Pacientes</span>
+            </button>
+            <button
+              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              onClick={() => navigate("/appointments")}
             >
               <Calendar className="h-5 w-5" />
-              <button onClick={() => navigate("/appointments")}>
-                Consultas
-              </button>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
+              <span>Consultas</span>
+            </button>
+            <button
+              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              onClick={() => navigate("/notes")}
             >
               <ClipboardList className="h-5 w-5" />
               <span>Notas de sesión</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
+            </button>
+            <button
+              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              onClick={() => navigate("/progress")}
             >
               <BarChart2 className="h-5 w-5" />
               <span>Progreso</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
+            </button>
+            <button
+              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              onClick={() => navigate("/payments")}
             >
               <DollarSign className="h-5 w-5" />
-              <button onClick={() => navigate("/payments")}>Pagos</button>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10"
+              <span>Pagos</span>
+            </button>
+            <button
+              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              onClick={() => navigate("/settings")}
             >
               <Settings className="h-5 w-5" />
               <span>Configuración</span>
-            </a>
+            </button>
           </nav>
         </div>
 
         <div className="absolute bottom-0 w-64 p-6">
-          <a
-            href="#"
-            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 text-red-300"
+          <button
+            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 text-red-300 w-full text-left"
+            onClick={() => navigate("/logout")}
           >
             <LogOut className="h-5 w-5" />
             <span>Cerrar sesión</span>
-          </a>
+          </button>
         </div>
       </aside>
 
