@@ -51,30 +51,29 @@ class Ficha(viewsets.ModelViewSet):
 class RegisterView(APIView):
     def post(self, request):
         data = request.data
-        email = data.get('email')
-        username = data.get('nombre')
+        email = data.get('email') 
         password = data.get('password')
+        name = data.get('name')
         apellido = data.get('apellido')
         matricula = data.get('matricula')
 
-        if not username or not password or not email or not apellido or not matricula:
+        if not email or not password or not apellido or not matricula:
             return Response({"error": "Todos los campos son obligatorios"}, status=400)
         
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(username=email).exists():
             return Response({"error": "El email ya está en uso"}, status=400)
         
         
 
         user = User.objects.create_user(
-            email=email,
-            username=username,
+            username=email,
             password=password,
         )
 
         if Profesional.objects.filter(matricula = matricula).exists():
             return Response({"error": "La matrícula ya está en uso"}, status=400)
         
-        Profesional.objects.create(user=user, matricula=matricula)
+        Profesional.objects.create(user=user, matricula=matricula, nombre=name, apellido=apellido)
 
 
         
@@ -82,4 +81,18 @@ class RegisterView(APIView):
     
 
 
-  
+class LoginView(APIView):
+    def post(self, request):
+        data = request.data
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password :
+            return Response({"error": "Email y contraseña son obligatorios"}, status=400)
+
+        user = authenticate(request, username=email, password=password)
+
+        if user is None:
+            return Response({"error": "Credenciales inválidas"}, status=401)
+
+        return Response({"message": "Inicio de sesión exitoso"}, status=200)

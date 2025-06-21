@@ -9,6 +9,8 @@ class Profesional(models.Model):
     User = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profesional') ##Asociamos el perfil de profesinal con User de Django
     ##campo username y password ya vienen por defecto en User de Django. Usaremos username para albergar el email del profesional
     matricula = models.CharField(max_length=100, unique=True)
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
