@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from .models import Profesional, Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha
 from .serializers import ProfesionalSerializer, EspecialidadSerializer, ConsultorioSerializer, PacienteSerializer, ConsultaSerializer, TrastornoSerializer, DrogaSerializer, FichaSerializer
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User 
 from rest_framework.views import APIView
 
 
@@ -47,28 +48,38 @@ class Ficha(viewsets.ModelViewSet):
 
 ##VISTA DE AUTENTICACION
 
-class LoginView(APIView):
-    def post(self,request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-            
-        user = authenticate(request, email=email, password=password)
-            
-        if user is not None:
-            
-            return Response({
-                'id': user.id,
-                'email': user.email,
-                'nombre': user.nombre,
-                'apellido': user.apellido,
-                'matricula': user.matricula,
-                'especialidades': [esp.nombre for esp in user.especialidades.all()],
-                'terapeuta': user.terapeuta,
-                'psiquiatra': user.psiquiatra,
-                'psicologo': user.psicologo
-            })
-        else:
-            return Response({'error': 'Invalid credentials'})
+class RegisterView(APIView):
+    def post(self, request):
+        data = request.data
+        email = data.get('email')
+        username = data.get('nombre')
+        password = data.get('password')
+        apellido = data.get('apellido')
+        matricula = data.get('matricula')
+
+        if not username or not password or not email or not apellido or not matricula:
+            return Response({"error": "Todos los campos son obligatorios"}, status=400)
+        
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "El email ya está en uso"}, status=400)
+        
+        
+
+        user = User.objects.create_user(
+            email=email,
+            username=username,
+            password=password,
+        )
+
+        if Profesional.objects.filter(matricula = matricula).exists():
+            return Response({"error": "La matrícula ya está en uso"}, status=400)
+        
+        Profesional.objects.create(user=user, matricula=matricula)
+
+
+        
+        return Response({"message": "Usuario creado exitosamente"}, status=201)
+    
 
 
   

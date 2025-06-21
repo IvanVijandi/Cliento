@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'app',
+    'rest_framework.authtoken',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -85,14 +86,21 @@ WSGI_APPLICATION = 'Cliento.wsgi.application'
 
 
 
+##DATABASES = {
+    #'default': {
+        #'ENGINE': 'django.db.backends.postgresql',
+       # 'NAME': config('db_name'),
+      #  'USER': config('db_user'),
+     #   'PASSWORD': config('db_password'),
+    #    'HOST': config('db_host'),
+   #     'PORT': config('db_port'),
+  #  }
+##}##
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('db_name'),
-        'USER': config('db_user'),
-        'PASSWORD': config('db_password'),
-        'HOST': config('db_host'),
-        'PORT': config('db_port'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

@@ -6,9 +6,7 @@ class ProfesionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profesional
         fields = '__all__'
-        ##Redefinicion de la contraseña
-    def create(self, validated_data):
-        return Profesional.objects.create_user(**validated_data)
+    
 
 class EspecialidadSerializer(serializers.ModelSerializer):
     class Meta:
