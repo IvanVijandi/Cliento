@@ -11,11 +11,9 @@ from rest_framework.views import APIView
 ##Ya nos da PUT/DELETE/GET/POST
 
 ##VISTAS PARA LOS MODELOS
-
 class Profesional(viewsets.ModelViewSet):
-    queryset = Profesional.objects.all() ##url base
+    queryset = Profesional.objects.all()
     serializer_class = ProfesionalSerializer
-    
 
 class Especialidad(viewsets.ModelViewSet):
     queryset = Especialidad.objects.all()

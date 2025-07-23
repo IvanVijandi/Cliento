@@ -12,8 +12,8 @@ import Button from "../components/ui/Button";
 
 // Define schema for form validation
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("Por favor ingresa una dirección de correo válida"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
 });
 
 type LoginFormData = {
@@ -38,7 +38,7 @@ const Login: React.FC = () => {
     setIsLoading(true);
     try {
       const credenciales = {
-        method: "POST", // Corregido: "methhod" -> "method"
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -63,7 +63,6 @@ const Login: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-    navigate("/dashboard");
   };
 
   return (
@@ -79,15 +78,15 @@ const Login: React.FC = () => {
               </div>
             </div>
             <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Welcome back
+              Bienvenido de vuelta
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Don't have an account?{" "}
+              ¿No tienes una cuenta?{" "}
               <Link
                 to="/register"
                 className="font-medium text-primary hover:text-primary-dark transition-colors"
               >
-                Sign up
+                Regístrate
               </Link>
             </p>
           </div>
@@ -96,11 +95,11 @@ const Login: React.FC = () => {
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <Input
-                  label="Email address"
+                  label="Correo electrónico"
                   type="email"
                   id="email"
                   autoComplete="email"
-                  placeholder="you@example.com"
+                  placeholder="tu@ejemplo.com"
                   error={errors.email?.message}
                   {...register("email")}
                 />
@@ -108,7 +107,7 @@ const Login: React.FC = () => {
 
               <div className="relative">
                 <Input
-                  label="Password"
+                  label="Contraseña"
                   type={showPassword ? "text" : "password"}
                   id="password"
                   autoComplete="current-password"
@@ -142,7 +141,7 @@ const Login: React.FC = () => {
                     htmlFor="remember-me"
                     className="ml-2 block text-sm text-gray-700"
                   >
-                    Remember me
+                    Recordarme
                   </label>
                 </div>
 
@@ -150,12 +149,12 @@ const Login: React.FC = () => {
                   to="/forgot-password"
                   className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
                 >
-                  Forgot your password?
+                  ¿Olvidaste tu contraseña?
                 </Link>
               </div>
 
               <Button type="submit" fullWidth isLoading={isLoading}>
-                Sign in
+                Iniciar sesión
               </Button>
             </form>
 
@@ -166,7 +165,7 @@ const Login: React.FC = () => {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-white text-gray-500">
-                    Or continue with
+                    O continúa con
                   </span>
                 </div>
               </div>
@@ -176,7 +175,7 @@ const Login: React.FC = () => {
                   type="button"
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  <span className="sr-only">Sign in with Google</span>
+                  <span className="sr-only">Iniciar sesión con Google</span>
                   <svg
                     className="h-5 w-5"
                     aria-hidden="true"
@@ -206,7 +205,7 @@ const Login: React.FC = () => {
                   type="button"
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  <span className="sr-only">Sign in with Apple</span>
+                  <span className="sr-only">Iniciar sesión con Apple</span>
                   <svg
                     className="h-5 w-5"
                     aria-hidden="true"

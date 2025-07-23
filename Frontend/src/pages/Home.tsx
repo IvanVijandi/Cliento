@@ -25,23 +25,23 @@ const Home: React.FC = () => {
             <div className="flex flex-col lg:flex-row items-center gap-12">
               <div className="lg:w-1/2 space-y-6 animate-slide-up">
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                  Streamline Your Mental Health Practice
+                  Optimiza tu Práctica de Salud Mental
                 </h1>
                 <p className="text-xl text-gray-600">
-                  MindTrack helps mental health professionals manage clients,
-                  schedule appointments, and store session notes securely in one
-                  intuitive platform.
+                  Cliento ayuda a profesionales de la salud mental a gestionar
+                  clientes, programar citas y almacenar notas de sesión de forma
+                  segura en una plataforma intuitiva.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link to="/register">
                     <Button size="lg">
-                      Get Started
+                      Comenzar
                       <ChevronRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
                   <Link to="/login">
                     <Button variant="outline" size="lg">
-                      Log in
+                      Iniciar Sesión
                     </Button>
                   </Link>
                 </div>
@@ -52,7 +52,7 @@ const Home: React.FC = () => {
                   <div className="relative bg-white rounded-lg shadow-xl overflow-hidden">
                     <img
                       src="https://images.pexels.com/photos/7176319/pexels-photo-7176319.jpeg"
-                      alt="Mental health professional with client"
+                      alt="Profesional de salud mental con cliente"
                       className="w-full h-auto rounded-lg"
                     />
                   </div>
@@ -67,12 +67,12 @@ const Home: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900">
-                Designed for Mental Health Professionals
+                Diseñado para Profesionales de Salud Mental
               </h2>
               <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-                Our comprehensive platform streamlines your practice management,
-                giving you more time to focus on what matters most: your
-                clients.
+                Nuestra plataforma integral simplifica la gestión de tu práctica,
+                dándote más tiempo para enfocarte en lo que más importa: tus
+                clientes.
               </p>
             </div>
 
@@ -83,11 +83,11 @@ const Home: React.FC = () => {
                   <Users className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Client Management
+                  Gestión de Clientes
                 </h3>
                 <p className="text-gray-600">
-                  Maintain detailed client profiles with contact information,
-                  history, and custom notes in a secure environment.
+                  Mantén perfiles detallados de clientes con información de
+                  contacto, historial y notas personalizadas en un entorno seguro.
                 </p>
               </div>
 
@@ -97,11 +97,11 @@ const Home: React.FC = () => {
                   <Calendar className="h-6 w-6 text-secondary" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Appointment Scheduling
+                  Programación de Citas
                 </h3>
                 <p className="text-gray-600">
-                  Effortlessly schedule and manage appointments with automated
-                  reminders to reduce no-shows.
+                  Programa y gestiona citas fácilmente con recordatorios
+                  automáticos para reducir las faltas.
                 </p>
               </div>
 
@@ -111,11 +111,11 @@ const Home: React.FC = () => {
                   <ClipboardCheck className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Session Notes
+                  Notas de Sesión
                 </h3>
                 <p className="text-gray-600">
-                  Create and store structured session notes with custom
-                  templates to track progress and treatment plans.
+                  Crea y almacena notas de sesión estructuradas con plantillas
+                  personalizadas para seguir el progreso y planes de tratamiento.
                 </p>
               </div>
 
@@ -125,11 +125,12 @@ const Home: React.FC = () => {
                   <ShieldCheck className="h-6 w-6 text-secondary" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Secure & Compliant
+                  Seguro y Conforme
                 </h3>
                 <p className="text-gray-600">
-                  Rest easy knowing your client data is protected with
-                  enterprise-grade security and compliance standards.
+                  Ten tranquilidad sabiendo que los datos de tus clientes están
+                  protegidos con seguridad y estándares de cumplimiento
+                  empresariales.
                 </p>
               </div>
 
@@ -139,11 +140,11 @@ const Home: React.FC = () => {
                   <BarChart2 className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Insights & Analytics
+                  Estadísticas y Análisis
                 </h3>
                 <p className="text-gray-600">
-                  Gain valuable insights into your practice with analytics on
-                  client progress, attendance rates, and more.
+                  Obtén información valiosa sobre tu práctica con análisis del
+                  progreso de clientes, tasas de asistencia y más.
                 </p>
               </div>
 
@@ -153,11 +154,11 @@ const Home: React.FC = () => {
                   <Brain className="h-6 w-6 text-secondary" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Intuitive Interface
+                  Interfaz Intuitiva
                 </h3>
                 <p className="text-gray-600">
-                  Enjoy a beautifully designed interface that makes managing
-                  your practice a pleasure.
+                  Disfruta de una interfaz bellamente diseñada que hace que
+                  gestionar tu práctica sea un placer.
                 </p>
               </div>
             </div>
@@ -169,10 +170,10 @@ const Home: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900">
-                Trusted by Mental Health Professionals
+                Confianza de Profesionales de Salud Mental
               </h2>
               <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-                See what other professionals are saying about our platform.
+                Mira lo que otros profesionales dicen sobre nuestra plataforma.
               </p>
             </div>
 
@@ -180,9 +181,9 @@ const Home: React.FC = () => {
               {/* Testimonial 1 */}
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <p className="text-gray-600 italic mb-4">
-                  "MindTrack has revolutionized how I manage my therapy
-                  practice. The interface is intuitive, and I've saved hours on
-                  administrative tasks."
+                  "Cliento ha revolucionado la forma en que gestiono mi práctica
+                  de terapia. La interfaz es intuitiva y he ahorrado horas en
+                  tareas administrativas."
                 </p>
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
@@ -190,10 +191,10 @@ const Home: React.FC = () => {
                   </div>
                   <div className="ml-3">
                     <h4 className="text-sm font-medium text-gray-900">
-                      Dr. Jane Davis
+                      Dra. Juana Díaz
                     </h4>
                     <p className="text-sm text-gray-500">
-                      Clinical Psychologist
+                      Psicóloga Clínica
                     </p>
                   </div>
                 </div>
@@ -202,9 +203,9 @@ const Home: React.FC = () => {
               {/* Testimonial 2 */}
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <p className="text-gray-600 italic mb-4">
-                  "The client management features are excellent. I can easily
-                  track progress and maintain detailed notes that help me
-                  provide better care."
+                  "Las funciones de gestión de clientes son excelentes. Puedo
+                  seguir fácilmente el progreso y mantener notas detalladas que
+                  me ayudan a brindar mejor atención."
                 </p>
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-10 w-10 bg-secondary rounded-full flex items-center justify-center text-white font-semibold">
@@ -212,9 +213,9 @@ const Home: React.FC = () => {
                   </div>
                   <div className="ml-3">
                     <h4 className="text-sm font-medium text-gray-900">
-                      Mark Stevens
+                      Marco Sánchez
                     </h4>
-                    <p className="text-sm text-gray-500">Licensed Therapist</p>
+                    <p className="text-sm text-gray-500">Terapeuta Licenciado</p>
                   </div>
                 </div>
               </div>
@@ -222,9 +223,9 @@ const Home: React.FC = () => {
               {/* Testimonial 3 */}
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <p className="text-gray-600 italic mb-4">
-                  "The scheduling system alone has cut down on no-shows by 40%.
-                  This platform pays for itself in saved time and improved
-                  efficiency."
+                  "Solo el sistema de programación ha reducido las faltas en un
+                  40%. Esta plataforma se paga sola con el tiempo ahorrado y la
+                  mejora en eficiencia."
                 </p>
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-10 w-10 bg-accent rounded-full flex items-center justify-center text-white font-semibold">
@@ -232,9 +233,9 @@ const Home: React.FC = () => {
                   </div>
                   <div className="ml-3">
                     <h4 className="text-sm font-medium text-gray-900">
-                      Dr. Emily Liu
+                      Dra. Elena López
                     </h4>
-                    <p className="text-sm text-gray-500">Psychiatrist</p>
+                    <p className="text-sm text-gray-500">Psiquiatra</p>
                   </div>
                 </div>
               </div>
@@ -246,11 +247,11 @@ const Home: React.FC = () => {
         <section className="py-20 bg-gradient-to-r from-primary to-secondary text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold mb-6">
-              Ready to Transform Your Practice?
+              ¿Listo para Transformar tu Práctica?
             </h2>
             <p className="text-xl mb-8 max-w-3xl mx-auto">
-              Join thousands of mental health professionals who have streamlined
-              their practice with MindTrack.
+              Únete a miles de profesionales de salud mental que han optimizado
+              su práctica con Cliento.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/register">
@@ -259,7 +260,7 @@ const Home: React.FC = () => {
                   size="lg"
                   className="bg-white text-primary hover:bg-gray-100"
                 >
-                  Start Free Trial
+                  Prueba Gratuita
                 </Button>
               </Link>
               <Link to="#contact">
@@ -268,7 +269,7 @@ const Home: React.FC = () => {
                   size="lg"
                   className="border-white text-white hover:bg-white/10"
                 >
-                  Contact Sales
+                  Contactar Ventas
                 </Button>
               </Link>
             </div>
