@@ -1,108 +1,261 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Brain,
   Users,
   Calendar,
   ClipboardList,
-  BarChart2,
-  MessageSquare,
-  Settings,
   LogOut,
-  DollarSign,
+  AlertCircle,
+  Home,
 } from "lucide-react";
 import Button from "../components/ui/Button";
 
+// Interfaces para los datos de la API
+interface Profesional {
+  id: string;
+  nombre: string;
+  apellido: string;
+  matricula: string;
+  email?: string;
+  is_active: boolean;
+  is_staff: boolean;
+}
+
+interface Paciente {
+  id: string;
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono: string;
+  fecha_nacimiento: string;
+  dni: string;
+  direccion: string;
+  altura: number;
+  peso: number;
+}
+
+interface Consulta {
+  id: string;
+  fecha: string;
+  profesional: number;
+  consultorio: number;
+  paciente: number;
+  virtual: boolean;
+}
+
+interface Ficha {
+  id: string;
+  paciente: number;
+}
+
+interface EstadisticasDashboard {
+  pacientesActivos: number;
+  citasEstaSemana: number;
+  notasPendientes: number;
+  alertasImportantes: number;
+}
+
 const Dashboard: React.FC = () => {
-  const appointments = [
-    {
-      id: 1,
-      patientName: "Ana López",
-      date: "26 de abril de 2024",
-      time: "10:00",
-      type: "Presencial",
-    },
-    {
-      id: 2,
-      patientName: "Jorge Sánchez",
-      date: "26 de abril de 2024",
-      time: "15:00",
-      type: "Online",
-    },
-    {
-      id: 3,
-      patientName: "Marta Gómez",
-      date: "26 de abril de 2024",
-      time: "17:00",
-      type: "Online",
-    },
-  ];
+  const [profesional, setProfesional] = useState<Profesional | null>(null);
+  const [estadisticas, setEstadisticas] = useState<EstadisticasDashboard>({
+    pacientesActivos: 0,
+    citasEstaSemana: 0,
+    notasPendientes: 0,
+    alertasImportantes: 0,
+  });
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
+  // Función para obtener datos de un endpoint
+  const fetchData = async (endpoint: string) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/${endpoint}/`);
+      if (!response.ok) {
+        throw new Error(`Error al obtener ${endpoint}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(`Error fetching ${endpoint}:`, error);
+      throw error;
+    }
+  };
+
+  // Función para obtener la fecha de la semana actual
+  const getWeekRange = () => {
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+    const endOfWeek = new Date(now.setDate(startOfWeek.getDate() + 6));
+    return { startOfWeek, endOfWeek };
+  };
+
+  // Función para filtrar consultas de esta semana
+  const filterConsultasThisWeek = (consultas: Consulta[]) => {
+    const { startOfWeek, endOfWeek } = getWeekRange();
+    return consultas.filter(consulta => {
+      const consultaDate = new Date(consulta.fecha);
+      return consultaDate >= startOfWeek && consultaDate <= endOfWeek;
+    });
+  };
+
+  // Función principal para cargar todos los datos
+  const cargarDatosDashboard = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Obtener todos los datos en paralelo
+      const [
+        profesionalesData,
+        pacientesData,
+        consultasData,
+        fichasData
+      ] = await Promise.all([
+        fetchData('profesional'),
+        fetchData('paciente'),
+        fetchData('consulta'),
+        fetchData('ficha')
+      ]);
+
+      // Establecer datos de pacientes
+      setPacientes(pacientesData);
+
+      // Obtener el primer profesional (en una app real sería el usuario logueado)
+      if (profesionalesData.length > 0) {
+        setProfesional(profesionalesData[0]);
+      }
+
+      // Calcular estadísticas
+      const pacientesActivos = pacientesData.length;
+      const citasEstaSemana = filterConsultasThisWeek(consultasData).length;
+      const notasPendientes = fichasData.length;
+      const alertasImportantes = Math.floor(Math.random() * 3) + 1; // Simulado
+
+      setEstadisticas({
+        pacientesActivos,
+        citasEstaSemana,
+        notasPendientes,
+        alertasImportantes
+      });
+
+    } catch (error) {
+      setError('Error al cargar los datos del dashboard');
+      console.error('Error al cargar datos del dashboard:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    cargarDatosDashboard();
+  }, []);
+
+  // Función para manejar el logout
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/login');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error al cargar el dashboard</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button onClick={cargarDatosDashboard}>
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
+      {/* Sidebar con colores originales */}
       <aside className="w-64 bg-[#2C3E50] text-white">
+        {/* Logo */}
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-8">
             <Brain className="h-8 w-8" />
-            <span className="text-xl font-semibold">Dashboard</span>
+            <span className="text-xl font-semibold">Cliento</span>
           </div>
 
+          {/* Navigation */}
           <nav className="space-y-2">
-            <button
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
-              onClick={() => navigate("/Patients")}
-            >
-              <Users className="h-5 w-5" />
-              <span>Pacientes</span>
+            <button className="bg-white/10 text-white group flex items-center px-3 py-3 text-sm font-medium rounded-lg w-full text-left">
+              <Home className="h-5 w-5 mr-3" />
+              Dashboard
             </button>
+            
             <button
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              className="text-white hover:bg-white/10 group flex items-center px-3 py-3 text-sm font-medium rounded-lg w-full text-left transition-colors"
+              onClick={() => navigate("/patients")}
+            >
+              <Users className="h-5 w-5 mr-3" />
+              Pacientes
+            </button>
+            
+            <button
+              className="text-white hover:bg-white/10 group flex items-center px-3 py-3 text-sm font-medium rounded-lg w-full text-left transition-colors"
               onClick={() => navigate("/appointments")}
             >
-              <Calendar className="h-5 w-5" />
-              <span>Consultas</span>
+              <Calendar className="h-5 w-5 mr-3" />
+              Consultas
             </button>
+            
             <button
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
+              className="text-white hover:bg-white/10 group flex items-center px-3 py-3 text-sm font-medium rounded-lg w-full text-left transition-colors"
               onClick={() => navigate("/notes")}
             >
-              <ClipboardList className="h-5 w-5" />
-              <span>Notas de sesión</span>
-            </button>
-            <button
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
-              onClick={() => navigate("/progress")}
-            >
-              <BarChart2 className="h-5 w-5" />
-              <span>Progreso</span>
-            </button>
-            <button
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
-              onClick={() => navigate("/payments")}
-            >
-              <DollarSign className="h-5 w-5" />
-              <span>Pagos</span>
-            </button>
-            <button
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 w-full text-left"
-              onClick={() => navigate("/settings")}
-            >
-              <Settings className="h-5 w-5" />
-              <span>Configuración</span>
+              <ClipboardList className="h-5 w-5 mr-3" />
+              Notas de sesión
             </button>
           </nav>
         </div>
 
+        {/* User info y logout */}
         <div className="absolute bottom-0 w-64 p-6">
+          {profesional && (
+            <div className="flex items-center space-x-3 mb-4 p-3 bg-white/5 rounded-lg">
+              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                <span className="text-sm font-semibold text-white">
+                  {profesional.nombre[0]}{profesional.apellido[0]}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">
+                  {profesional.nombre} {profesional.apellido}
+                </p>
+                <p className="text-xs text-gray-300 truncate">
+                  Mat: {profesional.matricula}
+                </p>
+              </div>
+            </div>
+          )}
+          
           <button
-            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 text-red-300 w-full text-left"
-            onClick={() => navigate("/logout")}
+            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 text-red-300 w-full text-left transition-colors"
+            onClick={handleLogout}
           >
             <LogOut className="h-5 w-5" />
-            <span>Cerrar sesión</span>
+            <span className="text-sm font-medium">Cerrar sesión</span>
           </button>
         </div>
       </aside>
@@ -110,94 +263,96 @@ const Dashboard: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center space-x-4">
-              <img
-                src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
-                alt="Profile"
-                className="h-16 w-16 rounded-full object-cover"
-              />
-              <div>
-                <h1 className="text-2xl font-bold">David Rodriguez</h1>
-                <p className="text-gray-600">Psicólogo</p>
-              </div>
-            </div>
-            <Button size="lg" className="bg-[#4A90E2] hover:bg-[#357ABD]">
-              + Nueva cita
-            </Button>
+          {/* Header simplificado */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Dashboard
+            </h1>
+            <p className="text-gray-600">
+              Resumen general de tu práctica profesional
+            </p>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-center space-x-3 mb-2">
-                <Users className="h-6 w-6 text-[#4A90E2]" />
-                <span className="text-3xl font-bold">32</span>
+          {/* Stats Grid principal */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Pacientes activos</p>
+                  <p className="text-3xl font-bold text-gray-900">{estadisticas.pacientesActivos}</p>
+                </div>
               </div>
-              <p className="text-gray-600">Pacientes activos</p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-center space-x-3 mb-2">
-                <Calendar className="h-6 w-6 text-[#4A90E2]" />
-                <span className="text-3xl font-bold">14</span>
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Calendar className="h-8 w-8 text-primary" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Citas esta semana</p>
+                  <p className="text-3xl font-bold text-gray-900">{estadisticas.citasEstaSemana}</p>
+                </div>
               </div>
-              <p className="text-gray-600">Citas esta semana</p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-center space-x-3 mb-2">
-                <ClipboardList className="h-6 w-6 text-[#4A90E2]" />
-                <span className="text-3xl font-bold">3</span>
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <ClipboardList className="h-8 w-8 text-primary" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Fichas creadas</p>
+                  <p className="text-3xl font-bold text-gray-900">{estadisticas.notasPendientes}</p>
+                </div>
               </div>
-              <p className="text-gray-600">Notas pendientes</p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-center space-x-3 mb-2">
-                <MessageSquare className="h-6 w-6 text-[#4A90E2]" />
-                <span className="text-3xl font-bold">1</span>
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <AlertCircle className="h-8 w-8 text-primary" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500">Alertas pendientes</p>
+                  <p className="text-3xl font-bold text-gray-900">{estadisticas.alertasImportantes}</p>
+                </div>
               </div>
-              <p className="text-gray-600">Alertas importantes</p>
             </div>
           </div>
 
-          {/* Appointments Table */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-6">Próximas consultas</h2>
-            <table className="w-full">
-              <thead>
-                <tr className="text-left border-b">
-                  <th className="pb-3">Paciente</th>
-                  <th className="pb-3">Fecha y hora</th>
-                  <th className="pb-3">Modalidad</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.map((appointment) => (
-                  <tr key={appointment.id} className="border-b last:border-0">
-                    <td className="py-4">{appointment.patientName}</td>
-                    <td className="py-4">
-                      {appointment.date}
-                      <br />
-                      <span className="text-gray-600">{appointment.time}</span>
-                    </td>
-                    <td className="py-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm ${
-                          appointment.type === "Online"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
-                      >
-                        {appointment.type}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Resumen estadístico único */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Resumen de actividad</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="bg-primary/10 rounded-lg p-4 mb-2">
+                  <span className="block text-2xl font-bold text-primary">{estadisticas.pacientesActivos}</span>
+                </div>
+                <span className="text-sm text-gray-600">Total pacientes</span>
+              </div>
+              <div className="text-center">
+                <div className="bg-green-50 rounded-lg p-4 mb-2">
+                  <span className="block text-2xl font-bold text-green-600">{estadisticas.citasEstaSemana}</span>
+                </div>
+                <span className="text-sm text-gray-600">Citas semana</span>
+              </div>
+              <div className="text-center">
+                <div className="bg-purple-50 rounded-lg p-4 mb-2">
+                  <span className="block text-2xl font-bold text-purple-600">{estadisticas.notasPendientes}</span>
+                </div>
+                <span className="text-sm text-gray-600">Fichas registradas</span>
+              </div>
+              <div className="text-center">
+                <div className="bg-orange-50 rounded-lg p-4 mb-2">
+                  <span className="block text-2xl font-bold text-orange-600">{estadisticas.alertasImportantes}</span>
+                </div>
+                <span className="text-sm text-gray-600">Alertas pendientes</span>
+              </div>
+            </div>
           </div>
         </div>
       </main>

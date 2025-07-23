@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   Plus,
@@ -12,120 +12,258 @@ import {
   Mail,
   Calendar,
   AlertCircle,
+  Loader,
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 
+// Interface que coincide con el modelo de Django
 interface Patient {
   id: string;
-  firstName: string;
-  lastName: string;
+  nombre: string;
+  apellido: string;
   email: string;
-  phone: string;
-  dateOfBirth: string;
-  status: "active" | "inactive";
-  lastAppointment?: string;
-  nextAppointment?: string;
+  telefono: string;
+  fecha_nacimiento: string;
+  dni: string;
+  direccion: string;
+  altura: number;
+  peso: number;
 }
 
-const mockPatients: Patient[] = [
-  {
-    id: "1",
-    firstName: "Ana",
-    lastName: "López",
-    email: "ana.lopez@email.com",
-    phone: "+34 612 345 678",
-    dateOfBirth: "1990-05-15",
-    status: "active",
-    lastAppointment: "2024-03-20",
-    nextAppointment: "2024-04-26",
-  },
-  {
-    id: "2",
-    firstName: "Jorge",
-    lastName: "Sánchez",
-    email: "jorge.sanchez@email.com",
-    phone: "+34 623 456 789",
-    dateOfBirth: "1985-08-22",
-    status: "active",
-    lastAppointment: "2024-03-25",
-    nextAppointment: "2024-04-26",
-  },
-  {
-    id: "3",
-    firstName: "Marta",
-    lastName: "Gómez",
-    email: "marta.gomez@email.com",
-    phone: "+34 634 567 890",
-    dateOfBirth: "1995-02-10",
-    status: "inactive",
-    lastAppointment: "2024-03-15",
-  },
-];
+// Interface para crear nuevos pacientes
+interface NewPatient {
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono: string;
+  fecha_nacimiento: string;
+  dni: string;
+  direccion: string;
+  altura: number;
+  peso: number;
+}
 
 const Patients: React.FC = () => {
-  const [patients, setPatients] = useState<Patient[]>(mockPatients);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-  const [newPatient, setNewPatient] = useState<Partial<Patient>>({
-    firstName: "",
-    lastName: "",
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newPatient, setNewPatient] = useState<NewPatient>({
+    nombre: "",
+    apellido: "",
     email: "",
-    phone: "",
-    dateOfBirth: "",
-    status: "active",
+    telefono: "",
+    fecha_nacimiento: "",
+    dni: "",
+    direccion: "",
+    altura: 0,
+    peso: 0,
   });
 
+  // Función para obtener todos los pacientes
+  const fetchPatients = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("http://127.0.0.1:8000/paciente/");
+      if (!response.ok) {
+        throw new Error("Error al obtener los pacientes");
+      }
+      const data = await response.json();
+      setPatients(data);
+    } catch (error) {
+      setError("Error al cargar los pacientes");
+      console.error("Error fetching patients:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Función para crear un nuevo paciente
+  const createPatient = async (patientData: NewPatient) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/paciente/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(patientData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al crear el paciente");
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error creating patient:", error);
+      throw error;
+    }
+  };
+
+  // Función para actualizar un paciente
+  const updatePatient = async (id: string, patientData: Partial<Patient>) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/paciente/${id}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(patientData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al actualizar el paciente");
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating patient:", error);
+      throw error;
+    }
+  };
+
+  // Función para eliminar un paciente
+  const deletePatient = async (id: string) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/paciente/${id}/`, {
+        method: "DELETE",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Error al eliminar el paciente");
+      }
+    } catch (error) {
+      console.error("Error deleting patient:", error);
+      throw error;
+    }
+  };
+
+  // Cargar pacientes al montar el componente
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  // Filtrar pacientes según la búsqueda
   const filteredPatients = patients.filter((patient) => {
     const searchLower = searchQuery.toLowerCase();
     return (
-      patient.firstName.toLowerCase().includes(searchLower) ||
-      patient.lastName.toLowerCase().includes(searchLower) ||
-      patient.email.toLowerCase().includes(searchLower)
+      patient.nombre.toLowerCase().includes(searchLower) ||
+      patient.apellido.toLowerCase().includes(searchLower) ||
+      patient.email.toLowerCase().includes(searchLower) ||
+      patient.dni.toLowerCase().includes(searchLower)
     );
   });
 
-  const handleAddPatient = () => {
-    if (newPatient.firstName && newPatient.lastName && newPatient.email) {
-      const patient: Patient = {
-        id: Date.now().toString(),
-        firstName: newPatient.firstName,
-        lastName: newPatient.lastName,
-        email: newPatient.email,
-        phone: newPatient.phone || "",
-        dateOfBirth: newPatient.dateOfBirth || "",
-        status: newPatient.status as "active" | "inactive",
-      };
-      setPatients([...patients, patient]);
+  // Manejar agregar nuevo paciente
+  const handleAddPatient = async () => {
+    if (!newPatient.nombre || !newPatient.apellido || !newPatient.email || !newPatient.dni) {
+      alert("Por favor, complete todos los campos obligatorios");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const createdPatient = await createPatient(newPatient);
+      setPatients([...patients, createdPatient]);
       setNewPatient({
-        firstName: "",
-        lastName: "",
+        nombre: "",
+        apellido: "",
         email: "",
-        phone: "",
-        dateOfBirth: "",
-        status: "active",
+        telefono: "",
+        fecha_nacimiento: "",
+        dni: "",
+        direccion: "",
+        altura: 0,
+        peso: 0,
       });
       setShowAddModal(false);
+      alert("Paciente agregado exitosamente");
+    } catch (error) {
+      alert(`Error al agregar paciente: ${error}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleUpdatePatient = () => {
-    if (editingPatient) {
+  // Manejar actualizar paciente
+  const handleUpdatePatient = async () => {
+    if (!editingPatient) return;
+
+    setIsSubmitting(true);
+    try {
+      const updatedPatient = await updatePatient(editingPatient.id, editingPatient);
       setPatients(
-        patients.map((p) => (p.id === editingPatient.id ? editingPatient : p))
+        patients.map((p) => (p.id === editingPatient.id ? updatedPatient : p))
       );
       setEditingPatient(null);
+      alert("Paciente actualizado exitosamente");
+    } catch (error) {
+      alert(`Error al actualizar paciente: ${error}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleDeletePatient = (id: string) => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar este paciente?")
-    ) {
+  // Manejar eliminar paciente
+  const handleDeletePatient = async (id: string) => {
+    if (!window.confirm("¿Estás seguro de que quieres eliminar este paciente?")) {
+      return;
+    }
+
+    try {
+      await deletePatient(id);
       setPatients(patients.filter((p) => p.id !== id));
+      alert("Paciente eliminado exitosamente");
+    } catch (error) {
+      alert(`Error al eliminar paciente: ${error}`);
     }
   };
+
+  // Calcular edad
+  const calculateAge = (birthDate: string) => {
+    if (!birthDate) return "-";
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return `${age} años`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-gray-600">Cargando pacientes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error al cargar pacientes</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button onClick={fetchPatients}>Reintentar</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,7 +274,7 @@ const Patients: React.FC = () => {
             <div className="flex items-center">
               <Users className="h-6 w-6 text-primary mr-2" />
               <h1 className="text-2xl font-semibold text-gray-900">
-                Pacientes
+                Pacientes ({patients.length})
               </h1>
             </div>
             <Button onClick={() => setShowAddModal(true)}>
@@ -155,7 +293,7 @@ const Patients: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               type="text"
-              placeholder="Buscar pacientes..."
+              placeholder="Buscar por nombre, apellido, email o DNI..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -165,98 +303,123 @@ const Patients: React.FC = () => {
 
         {/* Patients Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Paciente
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contacto
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Última Cita
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Próxima Cita
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredPatients.map((patient) => (
-                <tr key={patient.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-primary text-white rounded-full flex items-center justify-center">
-                        {patient.firstName[0]}
-                        {patient.lastName[0]}
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {patient.firstName} {patient.lastName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(patient.dateOfBirth).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.email}</div>
-                    <div className="text-sm text-gray-500">{patient.phone}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        patient.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {patient.status === "active" ? "Activo" : "Inactivo"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {patient.lastAppointment
-                      ? new Date(patient.lastAppointment).toLocaleDateString()
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {patient.nextAppointment
-                      ? new Date(patient.nextAppointment).toLocaleDateString()
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => setEditingPatient(patient)}
-                      className="text-primary hover:text-primary-dark mr-3"
-                    >
-                      <Edit2 className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeletePatient(patient.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  </td>
+          {filteredPatients.length === 0 ? (
+            <div className="text-center py-12">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {searchQuery ? "No se encontraron pacientes" : "No hay pacientes registrados"}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {searchQuery 
+                  ? "Intenta con otros términos de búsqueda" 
+                  : "Comienza agregando tu primer paciente"}
+              </p>
+              {!searchQuery && (
+                <Button onClick={() => setShowAddModal(true)}>
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Agregar primer paciente
+                </Button>
+              )}
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Paciente
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    DNI
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Contacto
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Edad
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Datos físicos
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Acciones
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredPatients.map((patient) => (
+                  <tr key={patient.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 bg-primary text-white rounded-full flex items-center justify-center">
+                          {patient.nombre[0]}{patient.apellido[0]}
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {patient.nombre} {patient.apellido}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {patient.direccion || "Sin dirección"}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{patient.dni}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 flex items-center">
+                        <Mail className="h-4 w-4 mr-1 text-gray-400" />
+                        {patient.email}
+                      </div>
+                      <div className="text-sm text-gray-500 flex items-center mt-1">
+                        <Phone className="h-4 w-4 mr-1 text-gray-400" />
+                        {patient.telefono || "Sin teléfono"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {calculateAge(patient.fecha_nacimiento)}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {patient.fecha_nacimiento 
+                          ? new Date(patient.fecha_nacimiento).toLocaleDateString('es-ES')
+                          : "Sin fecha"
+                        }
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {patient.altura > 0 ? `${patient.altura}m` : "-"} / {patient.peso > 0 ? `${patient.peso}kg` : "-"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => setEditingPatient(patient)}
+                        className="text-primary hover:text-primary-dark mr-3 p-1 rounded"
+                        title="Editar paciente"
+                      >
+                        <Edit2 className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeletePatient(patient.id)}
+                        className="text-red-600 hover:text-red-900 p-1 rounded"
+                        title="Eliminar paciente"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
       {/* Add Patient Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium text-gray-900">
@@ -265,64 +428,126 @@ const Patients: React.FC = () => {
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="text-gray-400 hover:text-gray-500"
+                  disabled={isSubmitting}
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
             <div className="px-6 py-4">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Nombre"
-                  value={newPatient.firstName}
+                  label="Nombre *"
+                  value={newPatient.nombre}
                   onChange={(e) =>
-                    setNewPatient({ ...newPatient, firstName: e.target.value })
+                    setNewPatient({ ...newPatient, nombre: e.target.value })
                   }
                   placeholder="Nombre del paciente"
+                  disabled={isSubmitting}
                 />
                 <Input
-                  label="Apellidos"
-                  value={newPatient.lastName}
+                  label="Apellidos *"
+                  value={newPatient.apellido}
                   onChange={(e) =>
-                    setNewPatient({ ...newPatient, lastName: e.target.value })
+                    setNewPatient({ ...newPatient, apellido: e.target.value })
                   }
                   placeholder="Apellidos del paciente"
+                  disabled={isSubmitting}
                 />
                 <Input
-                  label="Email"
+                  label="DNI *"
+                  value={newPatient.dni}
+                  onChange={(e) =>
+                    setNewPatient({ ...newPatient, dni: e.target.value })
+                  }
+                  placeholder="12345678X"
+                  disabled={isSubmitting}
+                />
+                <Input
+                  label="Email *"
                   type="email"
                   value={newPatient.email}
                   onChange={(e) =>
                     setNewPatient({ ...newPatient, email: e.target.value })
                   }
                   placeholder="email@ejemplo.com"
+                  disabled={isSubmitting}
                 />
                 <Input
                   label="Teléfono"
-                  value={newPatient.phone}
+                  value={newPatient.telefono}
                   onChange={(e) =>
-                    setNewPatient({ ...newPatient, phone: e.target.value })
+                    setNewPatient({ ...newPatient, telefono: e.target.value })
                   }
                   placeholder="+34 600 000 000"
+                  disabled={isSubmitting}
                 />
                 <Input
                   label="Fecha de nacimiento"
                   type="date"
-                  value={newPatient.dateOfBirth}
+                  value={newPatient.fecha_nacimiento}
                   onChange={(e) =>
                     setNewPatient({
                       ...newPatient,
-                      dateOfBirth: e.target.value,
+                      fecha_nacimiento: e.target.value,
                     })
                   }
+                  disabled={isSubmitting}
                 />
+                <Input
+                  label="Altura (metros)"
+                  type="number"
+                  step="0.01"
+                  value={newPatient.altura || ""}
+                  onChange={(e) =>
+                    setNewPatient({
+                      ...newPatient,
+                      altura: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  placeholder="1.75"
+                  disabled={isSubmitting}
+                />
+                <Input
+                  label="Peso (kg)"
+                  type="number"
+                  value={newPatient.peso || ""}
+                  onChange={(e) =>
+                    setNewPatient({
+                      ...newPatient,
+                      peso: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  placeholder="70"
+                  disabled={isSubmitting}
+                />
+                <div className="md:col-span-2">
+                  <Input
+                    label="Dirección"
+                    value={newPatient.direccion}
+                    onChange={(e) =>
+                      setNewPatient({ ...newPatient, direccion: e.target.value })
+                    }
+                    placeholder="Calle, número, ciudad..."
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
-              <Button variant="outline" onClick={() => setShowAddModal(false)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAddModal(false)}
+                disabled={isSubmitting}
+              >
                 Cancelar
               </Button>
-              <Button onClick={handleAddPatient}>Guardar</Button>
+              <Button 
+                onClick={handleAddPatient}
+                isLoading={isSubmitting}
+              >
+                Guardar
+              </Button>
             </div>
           </div>
         </div>
@@ -330,8 +555,8 @@ const Patients: React.FC = () => {
 
       {/* Edit Patient Modal */}
       {editingPatient && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium text-gray-900">
@@ -340,35 +565,49 @@ const Patients: React.FC = () => {
                 <button
                   onClick={() => setEditingPatient(null)}
                   className="text-gray-400 hover:text-gray-500"
+                  disabled={isSubmitting}
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
             <div className="px-6 py-4">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Nombre"
-                  value={editingPatient.firstName}
+                  label="Nombre *"
+                  value={editingPatient.nombre}
                   onChange={(e) =>
                     setEditingPatient({
                       ...editingPatient,
-                      firstName: e.target.value,
+                      nombre: e.target.value,
                     })
                   }
+                  disabled={isSubmitting}
                 />
                 <Input
-                  label="Apellidos"
-                  value={editingPatient.lastName}
+                  label="Apellidos *"
+                  value={editingPatient.apellido}
                   onChange={(e) =>
                     setEditingPatient({
                       ...editingPatient,
-                      lastName: e.target.value,
+                      apellido: e.target.value,
                     })
                   }
+                  disabled={isSubmitting}
                 />
                 <Input
-                  label="Email"
+                  label="DNI *"
+                  value={editingPatient.dni}
+                  onChange={(e) =>
+                    setEditingPatient({
+                      ...editingPatient,
+                      dni: e.target.value,
+                    })
+                  }
+                  disabled={isSubmitting}
+                />
+                <Input
+                  label="Email *"
                   type="email"
                   value={editingPatient.email}
                   onChange={(e) =>
@@ -377,53 +616,85 @@ const Patients: React.FC = () => {
                       email: e.target.value,
                     })
                   }
+                  disabled={isSubmitting}
                 />
                 <Input
                   label="Teléfono"
-                  value={editingPatient.phone}
+                  value={editingPatient.telefono}
                   onChange={(e) =>
                     setEditingPatient({
                       ...editingPatient,
-                      phone: e.target.value,
+                      telefono: e.target.value,
                     })
                   }
+                  disabled={isSubmitting}
                 />
                 <Input
                   label="Fecha de nacimiento"
                   type="date"
-                  value={editingPatient.dateOfBirth}
+                  value={editingPatient.fecha_nacimiento}
                   onChange={(e) =>
                     setEditingPatient({
                       ...editingPatient,
-                      dateOfBirth: e.target.value,
+                      fecha_nacimiento: e.target.value,
                     })
                   }
+                  disabled={isSubmitting}
                 />
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Estado
-                  </label>
-                  <select
-                    value={editingPatient.status}
+                <Input
+                  label="Altura (metros)"
+                  type="number"
+                  step="0.01"
+                  value={editingPatient.altura || ""}
+                  onChange={(e) =>
+                    setEditingPatient({
+                      ...editingPatient,
+                      altura: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  disabled={isSubmitting}
+                />
+                <Input
+                  label="Peso (kg)"
+                  type="number"
+                  value={editingPatient.peso || ""}
+                  onChange={(e) =>
+                    setEditingPatient({
+                      ...editingPatient,
+                      peso: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  disabled={isSubmitting}
+                />
+                <div className="md:col-span-2">
+                  <Input
+                    label="Dirección"
+                    value={editingPatient.direccion}
                     onChange={(e) =>
                       setEditingPatient({
                         ...editingPatient,
-                        status: e.target.value as "active" | "inactive",
+                        direccion: e.target.value,
                       })
                     }
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
-                  >
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
-                  </select>
+                    disabled={isSubmitting}
+                  />
                 </div>
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
-              <Button variant="outline" onClick={() => setEditingPatient(null)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setEditingPatient(null)}
+                disabled={isSubmitting}
+              >
                 Cancelar
               </Button>
-              <Button onClick={handleUpdatePatient}>Guardar cambios</Button>
+              <Button 
+                onClick={handleUpdatePatient}
+                isLoading={isSubmitting}
+              >
+                Guardar cambios
+              </Button>
             </div>
           </div>
         </div>

@@ -24,40 +24,37 @@ const Navbar: React.FC = () => {
               className="flex items-center text-primary hover:text-primary-dark transition-colors"
             >
               <Brain className="h-8 w-8 mr-2" />
-              <span className="text-lg font-semibold">MindTrack</span>
+              <span className="text-lg font-semibold">Cliento</span>
             </Link>
           </div>
 
           {/* Desktop navigation */}
           <div className="hidden sm:flex sm:items-center sm:space-x-4">
-            <Link to="/" className="px-3 py-2 text-gray-700 hover:text-primary transition-colors">
-              Home
-            </Link>
-            <Link to="#features" className="px-3 py-2 text-gray-700 hover:text-primary transition-colors">
-              Features
-            </Link>
-            <Link to="#pricing" className="px-3 py-2 text-gray-700 hover:text-primary transition-colors">
-              Pricing
-            </Link>
             {isAuthenticated ? (
               <>
-                <Link to="/dashboard" className="px-3 py-2 text-gray-700 hover:text-primary transition-colors">
-                  Dashboard
+                <Link to="/patients" className="px-3 py-2 text-gray-700 hover:text-primary transition-colors">
+                  Pacientes
+                </Link>
+                <Link to="/appointments" className="px-3 py-2 text-gray-700 hover:text-primary transition-colors">
+                  Consultas
+                </Link>
+                <Link to="/notes" className="px-3 py-2 text-gray-700 hover:text-primary transition-colors">
+                  Notas
                 </Link>
                 <Button 
                   variant="outline" 
                   onClick={handleLogout}
                 >
-                  Log out
+                  Cerrar sesión
                 </Button>
               </>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="outline">Log in</Button>
+                  <Button variant="outline">Iniciar sesión</Button>
                 </Link>
                 <Link to="/register">
-                  <Button>Get Started</Button>
+                  <Button>Registrarse</Button>
                 </Link>
               </>
             )}
@@ -69,7 +66,7 @@ const Navbar: React.FC = () => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">Abrir menú</span>
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
@@ -80,35 +77,28 @@ const Navbar: React.FC = () => {
       {isMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <Link
-              to="/"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="#features"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Features
-            </Link>
-            <Link
-              to="#pricing"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Pricing
-            </Link>
             {isAuthenticated ? (
               <>
                 <Link
-                  to="/dashboard"
+                  to="/patients"
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Dashboard
+                  Pacientes
+                </Link>
+                <Link
+                  to="/appointments"
+                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Consultas
+                </Link>
+                <Link
+                  to="/notes"
+                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Notas
                 </Link>
                 <button
                   onClick={() => {
@@ -117,7 +107,7 @@ const Navbar: React.FC = () => {
                   }}
                   className="w-full text-left block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
                 >
-                  Log out
+                  Cerrar sesión
                 </button>
               </>
             ) : (
@@ -127,14 +117,14 @@ const Navbar: React.FC = () => {
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Log in
+                  Iniciar sesión
                 </Link>
                 <Link
                   to="/register"
                   className="block px-3 py-2 text-base font-medium text-primary hover:text-primary-dark hover:bg-gray-50"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Get Started
+                  Registrarse
                 </Link>
               </>
             )}

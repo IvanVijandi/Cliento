@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.contrib.auth.models import User
 from .models import Profesional, Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha
 
 def run():
@@ -6,13 +7,23 @@ def run():
     especialidad1 = Especialidad.objects.create(nombre="Psicología", descripcion="Especialidad en psicología clínica")
     especialidad2 = Especialidad.objects.create(nombre="Psiquiatría", descripcion="Especialidad en psiquiatría")
 
-    # Crear profesionales
-    profesional1 = Profesional.objects.create_user(nombre="Juan",email="juan@gmail.com",password="12345678", apellido="Pérez", matricula="12345", terapeuta=True)
-    profesional2 = Profesional.objects.create_user(nombre="Ana",email="Ana@gmail.com",password="12345678", apellido="Gómez", matricula="67890", psiquiatra=True)
+    # Crear usuarios de Django primero
+    user1 = User.objects.create_user(username="juan@gmail.com", email="juan@gmail.com", password="12345678")
+    user2 = User.objects.create_user(username="ana@gmail.com", email="ana@gmail.com", password="12345678")
 
-    # Asociar especialidades a profesionales
-    profesional1.especialidades.add(especialidad1)
-    profesional2.especialidades.add(especialidad2)
+    # Crear profesionales (solo con los campos que existen en el modelo)
+    profesional1 = Profesional.objects.create(
+        User=user1, 
+        nombre="Juan", 
+        apellido="Pérez", 
+        matricula="12345"
+    )
+    profesional2 = Profesional.objects.create(
+        User=user2, 
+        nombre="Ana", 
+        apellido="Gómez", 
+        matricula="67890"
+    )
 
     # Crear consultorios
     consultorio1 = Consultorio.objects.create(direccion="Calle Falsa 123", telefono="123456789")
