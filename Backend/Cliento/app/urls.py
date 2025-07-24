@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 ##Vistas de modelos
 from .views import Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha, Profesional
 ##Vistas de autenticacion
-from .views import LoginView, RegisterView, LogoutView
+from .views import LoginView, RegisterView, LogoutView, verifySession
 
 
 router = DefaultRouter()
@@ -21,6 +21,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('verify-session/', verifySession.as_view(), name='verify_session'),
 
 ]
 

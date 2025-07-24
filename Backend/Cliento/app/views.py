@@ -110,5 +110,12 @@ class LoginView(APIView):
     
 class LogoutView(APIView):
     def post(self, request):
-        logout(request)  ##Elimina la cookie de la sesion del usuario
+        logout(request)  
         return Response({"message": "Sesión cerrada exitosamente"}, status=200)
+    
+
+class verifySession(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        return Response({"message": "Sesión activa", "user": user.username}, status=200)

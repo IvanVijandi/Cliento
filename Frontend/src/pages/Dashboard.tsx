@@ -162,12 +162,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     cargarDatosDashboard();
   }, []);
-
-  // Log para verificar la variable de entorno
-  useEffect(() => {
-    console.log('Dashboard API Base URL:', API_BASE_URL);
-  }, []);
-
+ 
   // Función para manejar el logout
   const handleLogout = () => {
     fetch(`${API_BASE_URL}/logout/`, {
