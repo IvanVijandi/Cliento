@@ -43,6 +43,7 @@ interface NewPatient {
   altura: number;
   peso: number;
 }
+const API_BASE_URL = import.meta.env.VITE_API_URL ;
 
 const Patients: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -69,7 +70,9 @@ const Patients: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://127.0.0.1:8000/paciente/");
+      const response = await fetch(`${API_BASE_URL}/paciente/`, {
+        credentials: "include" // Incluir cookies para sesión
+      });
       if (!response.ok) {
         throw new Error("Error al obtener los pacientes");
       }
@@ -86,12 +89,13 @@ const Patients: React.FC = () => {
   // Función para crear un nuevo paciente
   const createPatient = async (patientData: NewPatient) => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/paciente/", {
+      const response = await fetch(`${API_BASE_URL}/paciente/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(patientData),
+        credentials: "include" 
       });
       
       if (!response.ok) {
@@ -109,12 +113,13 @@ const Patients: React.FC = () => {
   // Función para actualizar un paciente
   const updatePatient = async (id: string, patientData: Partial<Patient>) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/paciente/${id}/`, {
+      const response = await fetch(`${API_BASE_URL}/paciente/${id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(patientData),
+        credentials: "include" 
       });
       
       if (!response.ok) {
@@ -132,8 +137,9 @@ const Patients: React.FC = () => {
   // Función para eliminar un paciente
   const deletePatient = async (id: string) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/paciente/${id}/`, {
+      const response = await fetch(`${API_BASE_URL}/paciente/${id}/`, {
         method: "DELETE",
+        credentials: "include" 
       });
       
       if (!response.ok) {

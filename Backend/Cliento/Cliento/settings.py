@@ -55,6 +55,7 @@ MIDDLEWARE = [
 ]
 
 ##Dominios permitidos para CORS
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Dominio del frontend (Vite)
     "http://127.0.0.1:5173",  # Otra posible URL del frontend

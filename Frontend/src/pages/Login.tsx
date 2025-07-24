@@ -10,6 +10,8 @@ import Footer from "../components/layout/Footer";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ;
+
 // Define schema for form validation
 const loginSchema = z.object({
   email: z.string().email("Por favor ingresa una dirección de correo válida"),
@@ -37,17 +39,18 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const credenciales = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      };
+   
 
       const response = await fetch(
-        "http://127.0.0.1:8000/login/",
-        credenciales
+        `${API_BASE_URL}/login/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+          credentials: "include", // Include cookies for session management
+        }
       );
 
       if (response.ok) {

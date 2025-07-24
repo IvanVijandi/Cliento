@@ -10,6 +10,9 @@ import Footer from '../components/layout/Footer';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 
+
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 // Define schema for form validation
 const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),

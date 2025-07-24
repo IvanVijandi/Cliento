@@ -55,6 +55,9 @@ interface NewConsulta {
 }
 
 const Appointments: React.FC = () => {
+  
+  const API_BASE_URL = import.meta.env.VITE_API_URL ;
+
   const [consultas, setConsultas] = useState<Consulta[]>([]);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [consultorios, setConsultorios] = useState<Consultorio[]>([]);
@@ -76,10 +79,16 @@ const Appointments: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  // Función para obtener datos
+  // Función para obtener datos (usando variable de entorno)
   const fetchData = async (endpoint: string) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/${endpoint}/`);
+      const response = await fetch(`${API_BASE_URL}/${endpoint}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error(`Error al obtener ${endpoint}`);
       return await response.json();
     } catch (error) {
@@ -128,7 +137,7 @@ const Appointments: React.FC = () => {
     }
   };
 
-  // CRUD Operations
+  // CRUD Operations (usando variable de entorno)
   const saveConsulta = async () => {
     if (!formData.fecha || !formData.paciente) {
       alert("Por favor, complete los campos obligatorios");
@@ -138,8 +147,8 @@ const Appointments: React.FC = () => {
     setIsSubmitting(true);
     try {
       const url = editingConsulta 
-        ? `http://127.0.0.1:8000/consulta/${editingConsulta.id}/`
-        : "http://127.0.0.1:8000/consulta/";
+        ? `${API_BASE_URL}/consulta/${editingConsulta.id}/`
+        : `${API_BASE_URL}/consulta/`;
       
       const method = editingConsulta ? "PUT" : "POST";
       
@@ -184,8 +193,9 @@ const Appointments: React.FC = () => {
     if (!window.confirm("¿Eliminar esta consulta?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/consulta/${id}/`, {
+      const response = await fetch(`${API_BASE_URL}/consulta/${id}/`, {
         method: "DELETE",
+        credentials: "include", 
       });
       
       if (!response.ok) throw new Error("Error al eliminar");
@@ -267,6 +277,11 @@ const Appointments: React.FC = () => {
     loadData();
   }, []);
 
+  // Log para verificar que la variable se está usando correctamente
+  useEffect(() => {
+    console.log('API Base URL:', API_BASE_URL);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -335,6 +350,19 @@ const Appointments: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Debug info (opcional - puedes quitar en producción) */}
+      {import.meta.env.DEV && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 m-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <strong>Debug:</strong> API URL configurada como: <code className="bg-yellow-100 px-1 rounded">{API_BASE_URL}</code>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Barra de búsqueda */}

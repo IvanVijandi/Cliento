@@ -57,6 +57,9 @@ interface EstadisticasDashboard {
 }
 
 const Dashboard: React.FC = () => {
+  // Variable de entorno para la API
+  const API_BASE_URL = import.meta.env.VITE_API_URL ;
+
   const [profesional, setProfesional] = useState<Profesional | null>(null);
   const [estadisticas, setEstadisticas] = useState<EstadisticasDashboard>({
     pacientesActivos: 0,
@@ -70,10 +73,16 @@ const Dashboard: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Función para obtener datos de un endpoint
+ 
   const fetchData = async (endpoint: string) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/${endpoint}/`);
+      const response = await fetch(`${API_BASE_URL}/${endpoint}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error(`Error al obtener ${endpoint}`);
       }
@@ -107,7 +116,7 @@ const Dashboard: React.FC = () => {
     setError(null);
 
     try {
-      // Obtener todos los datos en paralelo
+      // Obtener todos los datos en paralelo (usando variable de entorno)
       const [
         profesionalesData,
         pacientesData,
@@ -154,9 +163,33 @@ const Dashboard: React.FC = () => {
     cargarDatosDashboard();
   }, []);
 
+  // Log para verificar la variable de entorno
+  useEffect(() => {
+    console.log('Dashboard API Base URL:', API_BASE_URL);
+  }, []);
+
   // Función para manejar el logout
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
+    fetch(`${API_BASE_URL}/logout/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+      .then(response => {
+        if (response.ok) {
+          console.log("Logout successful");
+          navigate('/login');
+        } else {
+          console.error("Logout failed:", response.statusText);
+          alert("Error al cerrar sesión. Por favor, inténtalo de nuevo.");
+        }
+      })
+      .catch(error => {
+        console.error("Error en la solicitud de logout:", error);
+        alert("Ocurrió un error al cerrar sesión. Por favor, inténtalo más tarde.");
+      });
     navigate('/login');
   };
 

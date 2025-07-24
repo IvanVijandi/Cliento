@@ -1,0 +1,31 @@
+##Levantamos ambos contenedores frontend + backedn
+version: '3.8'
+
+services:
+  # Frontend React + Vite
+  frontend:
+    build: ./Frontend
+    container_name: cliento_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  # Backend Django
+  backend:
+    build: ./Backend/Cliento
+    container_name: cliento_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Backend/Cliento:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=Cliento.settings
+
+volumes:
+  node_modules:

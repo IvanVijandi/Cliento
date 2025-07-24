@@ -2,9 +2,10 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Profesional, Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha
 from .serializers import ProfesionalSerializer, EspecialidadSerializer, ConsultorioSerializer, PacienteSerializer, ConsultaSerializer, TrastornoSerializer, DrogaSerializer, FichaSerializer
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.models import User 
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 
 ##Clases de Vista viewsets | son como los controladores de Django pero para API REST
@@ -14,34 +15,42 @@ from rest_framework.views import APIView
 class Profesional(viewsets.ModelViewSet):
     queryset = Profesional.objects.all()
     serializer_class = ProfesionalSerializer
+    permission_classes = [IsAuthenticated]
 
 class Especialidad(viewsets.ModelViewSet):
     queryset = Especialidad.objects.all()
     serializer_class = EspecialidadSerializer
+    permission_classes = [IsAuthenticated]
 
 class Consultorio(viewsets.ModelViewSet):
     queryset = Consultorio.objects.all()
     serializer_class = ConsultorioSerializer
+    permission_classes = [IsAuthenticated]
 
 class Paciente(viewsets.ModelViewSet):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
+    permission_classes = [IsAuthenticated]
 
 class Consulta(viewsets.ModelViewSet):
     queryset = Consulta.objects.all()
     serializer_class = ConsultaSerializer
+    permission_classes = [IsAuthenticated]
 
 class Trastorno(viewsets.ModelViewSet):
     queryset = Trastorno.objects.all()
     serializer_class = TrastornoSerializer
+    permission_classes = [IsAuthenticated]
 
 class Droga(viewsets.ModelViewSet):
     queryset = Droga.objects.all()
     serializer_class = DrogaSerializer
+    permission_classes = [IsAuthenticated]
 
 class Ficha(viewsets.ModelViewSet):
     queryset = Ficha.objects.all()
-    serializer_class = FichaSerializer  
+    serializer_class = FichaSerializer
+    permission_classes = [IsAuthenticated]
 
 
 ##VISTA DE AUTENTICACION
@@ -92,5 +101,14 @@ class LoginView(APIView):
 
         if user is None:
             return Response({"error": "Credenciales inválidas"}, status=401)
+        
+        if user.is_active:
+            login(request, user) ##Establece cookie con la sesion del usuario
+            return Response({"message": "Inicio de sesión exitoso"}, status=200)
 
         return Response({"message": "Inicio de sesión exitoso"}, status=200)
+    
+class LogoutView(APIView):
+    def post(self, request):
+        logout(request)  ##Elimina la cookie de la sesion del usuario
+        return Response({"message": "Sesión cerrada exitosamente"}, status=200)

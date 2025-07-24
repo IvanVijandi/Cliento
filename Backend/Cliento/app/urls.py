@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 ##Vistas de modelos
 from .views import Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha, Profesional
 ##Vistas de autenticacion
-from .views import LoginView, RegisterView
+from .views import LoginView, RegisterView, LogoutView
 
 
 router = DefaultRouter()
@@ -20,6 +20,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
 ]
 
