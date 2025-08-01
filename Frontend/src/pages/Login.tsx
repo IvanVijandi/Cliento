@@ -10,7 +10,7 @@ import Footer from "../components/layout/Footer";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ;
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // Define schema for form validation
 const loginSchema = z.object({
@@ -39,19 +39,14 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-   
-
-      const response = await fetch(
-        `${API_BASE_URL}/login/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-          credentials: "include", // Include cookies for session management
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
 
       if (response.ok) {
         console.log("Login successful");

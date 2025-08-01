@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import {
   Brain,
@@ -55,10 +56,18 @@ interface EstadisticasDashboard {
   notasPendientes: number;
   alertasImportantes: number;
 }
+function getCookie(name: string): string | null {
+  const cookies = document.cookie ? document.cookie.split("; ") : [];
+  for (let cookie of cookies) {
+    const [key, value] = cookie.split("=");
+    if (key === name) return decodeURIComponent(value);
+  }
+  return null;
+}
 
 const Dashboard: React.FC = () => {
   // Variable de entorno para la API
-  const API_BASE_URL = import.meta.env.VITE_API_URL ;
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
 
   const [profesional, setProfesional] = useState<Profesional | null>(null);
   const [estadisticas, setEstadisticas] = useState<EstadisticasDashboard>({
@@ -73,15 +82,15 @@ const Dashboard: React.FC = () => {
 
   const navigate = useNavigate();
 
- 
   const fetchData = async (endpoint: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/${endpoint}/`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken") || "",
         },
-        credentials: 'include',
+        credentials: "include",
       });
       if (!response.ok) {
         throw new Error(`Error al obtener ${endpoint}`);
@@ -104,7 +113,7 @@ const Dashboard: React.FC = () => {
   // Función para filtrar consultas de esta semana
   const filterConsultasThisWeek = (consultas: Consulta[]) => {
     const { startOfWeek, endOfWeek } = getWeekRange();
-    return consultas.filter(consulta => {
+    return consultas.filter((consulta) => {
       const consultaDate = new Date(consulta.fecha);
       return consultaDate >= startOfWeek && consultaDate <= endOfWeek;
     });
@@ -117,17 +126,13 @@ const Dashboard: React.FC = () => {
 
     try {
       // Obtener todos los datos en paralelo (usando variable de entorno)
-      const [
-        profesionalesData,
-        pacientesData,
-        consultasData,
-        fichasData
-      ] = await Promise.all([
-        fetchData('profesional'),
-        fetchData('paciente'),
-        fetchData('consulta'),
-        fetchData('ficha')
-      ]);
+      const [profesionalesData, pacientesData, consultasData, fichasData] =
+        await Promise.all([
+          fetchData("profesional"),
+          fetchData("paciente"),
+          fetchData("consulta"),
+          fetchData("ficha"),
+        ]);
 
       // Establecer datos de pacientes
       setPacientes(pacientesData);
@@ -147,12 +152,11 @@ const Dashboard: React.FC = () => {
         pacientesActivos,
         citasEstaSemana,
         notasPendientes,
-        alertasImportantes
+        alertasImportantes,
       });
-
     } catch (error) {
-      setError('Error al cargar los datos del dashboard');
-      console.error('Error al cargar datos del dashboard:', error);
+      setError("Error al cargar los datos del dashboard");
+      console.error("Error al cargar datos del dashboard:", error);
     } finally {
       setIsLoading(false);
     }
@@ -162,30 +166,33 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     cargarDatosDashboard();
   }, []);
- 
+
   // Función para manejar el logout
   const handleLogout = () => {
     fetch(`${API_BASE_URL}/logout/`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken") || "",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
           console.log("Logout successful");
-          navigate('/login');
+          navigate("/login");
         } else {
           console.error("Logout failed:", response.statusText);
           alert("Error al cerrar sesión. Por favor, inténtalo de nuevo.");
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error en la solicitud de logout:", error);
-        alert("Ocurrió un error al cerrar sesión. Por favor, inténtalo más tarde.");
+        alert(
+          "Ocurrió un error al cerrar sesión. Por favor, inténtalo más tarde."
+        );
       });
-    navigate('/login');
+    navigate("/login");
   };
 
   if (isLoading) {
@@ -204,11 +211,11 @@ const Dashboard: React.FC = () => {
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error al cargar el dashboard</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Error al cargar el dashboard
+          </h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <Button onClick={cargarDatosDashboard}>
-            Reintentar
-          </Button>
+          <Button onClick={cargarDatosDashboard}>Reintentar</Button>
         </div>
       </div>
     );
@@ -231,7 +238,7 @@ const Dashboard: React.FC = () => {
               <Home className="h-5 w-5 mr-3" />
               Dashboard
             </button>
-            
+
             <button
               className="text-white hover:bg-white/10 group flex items-center px-3 py-3 text-sm font-medium rounded-lg w-full text-left transition-colors"
               onClick={() => navigate("/patients")}
@@ -239,7 +246,7 @@ const Dashboard: React.FC = () => {
               <Users className="h-5 w-5 mr-3" />
               Pacientes
             </button>
-            
+
             <button
               className="text-white hover:bg-white/10 group flex items-center px-3 py-3 text-sm font-medium rounded-lg w-full text-left transition-colors"
               onClick={() => navigate("/appointments")}
@@ -247,7 +254,7 @@ const Dashboard: React.FC = () => {
               <Calendar className="h-5 w-5 mr-3" />
               Consultas
             </button>
-            
+
             <button
               className="text-white hover:bg-white/10 group flex items-center px-3 py-3 text-sm font-medium rounded-lg w-full text-left transition-colors"
               onClick={() => navigate("/notes")}
@@ -264,7 +271,8 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center space-x-3 mb-4 p-3 bg-white/5 rounded-lg">
               <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-sm font-semibold text-white">
-                  {profesional.nombre[0]}{profesional.apellido[0]}
+                  {profesional.nombre[0]}
+                  {profesional.apellido[0]}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
@@ -277,7 +285,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           )}
-          
+
           <button
             className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 text-red-300 w-full text-left transition-colors"
             onClick={handleLogout}
@@ -293,9 +301,7 @@ const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           {/* Header simplificado */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Dashboard
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
             <p className="text-gray-600">
               Resumen general de tu práctica profesional
             </p>
@@ -309,8 +315,12 @@ const Dashboard: React.FC = () => {
                   <Users className="h-8 w-8 text-primary" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Pacientes activos</p>
-                  <p className="text-3xl font-bold text-gray-900">{estadisticas.pacientesActivos}</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    Pacientes activos
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {estadisticas.pacientesActivos}
+                  </p>
                 </div>
               </div>
             </div>
@@ -321,8 +331,12 @@ const Dashboard: React.FC = () => {
                   <Calendar className="h-8 w-8 text-primary" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Citas esta semana</p>
-                  <p className="text-3xl font-bold text-gray-900">{estadisticas.citasEstaSemana}</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    Citas esta semana
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {estadisticas.citasEstaSemana}
+                  </p>
                 </div>
               </div>
             </div>
@@ -333,52 +347,13 @@ const Dashboard: React.FC = () => {
                   <ClipboardList className="h-8 w-8 text-primary" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Fichas creadas</p>
-                  <p className="text-3xl font-bold text-gray-900">{estadisticas.notasPendientes}</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    Fichas creadas
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {estadisticas.notasPendientes}
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <AlertCircle className="h-8 w-8 text-primary" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Alertas pendientes</p>
-                  <p className="text-3xl font-bold text-gray-900">{estadisticas.alertasImportantes}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Resumen estadístico único */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Resumen de actividad</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="bg-primary/10 rounded-lg p-4 mb-2">
-                  <span className="block text-2xl font-bold text-primary">{estadisticas.pacientesActivos}</span>
-                </div>
-                <span className="text-sm text-gray-600">Total pacientes</span>
-              </div>
-              <div className="text-center">
-                <div className="bg-green-50 rounded-lg p-4 mb-2">
-                  <span className="block text-2xl font-bold text-green-600">{estadisticas.citasEstaSemana}</span>
-                </div>
-                <span className="text-sm text-gray-600">Citas semana</span>
-              </div>
-              <div className="text-center">
-                <div className="bg-purple-50 rounded-lg p-4 mb-2">
-                  <span className="block text-2xl font-bold text-purple-600">{estadisticas.notasPendientes}</span>
-                </div>
-                <span className="text-sm text-gray-600">Fichas registradas</span>
-              </div>
-              <div className="text-center">
-                <div className="bg-orange-50 rounded-lg p-4 mb-2">
-                  <span className="block text-2xl font-bold text-orange-600">{estadisticas.alertasImportantes}</span>
-                </div>
-                <span className="text-sm text-gray-600">Alertas pendientes</span>
               </div>
             </div>
           </div>

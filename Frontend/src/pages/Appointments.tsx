@@ -17,7 +17,16 @@ import {
   Grid3X3,
   List,
 } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addMonths, subMonths } from "date-fns";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameDay,
+  isToday,
+  addMonths,
+  subMonths,
+} from "date-fns";
 import { es } from "date-fns/locale";
 import Button from "../components/ui/Button";
 
@@ -54,10 +63,18 @@ interface NewConsulta {
   virtual: boolean;
 }
 
-const Appointments: React.FC = () => {
-  
-  const API_BASE_URL = import.meta.env.VITE_API_URL ;
+//Funcion para obtener cookies
+function getCookie(name: string): string | null {
+  const cookies = document.cookie ? document.cookie.split("; ") : [];
+  for (let cookie of cookies) {
+    const [key, value] = cookie.split("=");
+    if (key === name) return decodeURIComponent(value);
+  }
+  return null;
+}
 
+const Appointments: React.FC = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
   const [consultas, setConsultas] = useState<Consulta[]>([]);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [consultorios, setConsultorios] = useState<Consultorio[]>([]);
@@ -67,7 +84,8 @@ const Appointments: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  
+  console.log("Entré en appointments.tsx | token:", getCookie("csrftoken"));
+
   const [formData, setFormData] = useState<NewConsulta>({
     fecha: "",
     profesional: 1,
@@ -75,7 +93,7 @@ const Appointments: React.FC = () => {
     paciente: 0,
     virtual: false,
   });
-  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -83,11 +101,13 @@ const Appointments: React.FC = () => {
   const fetchData = async (endpoint: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/${endpoint}/`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken") || "",
         },
-        credentials: 'include',
+        credentials: "include",
       });
       if (!response.ok) throw new Error(`Error al obtener ${endpoint}`);
       return await response.json();
@@ -102,27 +122,29 @@ const Appointments: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [consultasData, pacientesData, consultoriosData] = await Promise.all([
-        fetchData('consulta'),
-        fetchData('paciente'),
-        fetchData('consultorio')
-      ]);
+      const [consultasData, pacientesData, consultoriosData] =
+        await Promise.all([
+          fetchData("consulta"),
+          fetchData("paciente"),
+          fetchData("consultorio"),
+        ]);
 
       // Enriquecer consultas
       const consultasEnriquecidas = consultasData.map((consulta: any) => {
-        const paciente = pacientesData.find((p: Paciente) => 
-          p.id.toString() === consulta.paciente.toString()
+        const paciente = pacientesData.find(
+          (p: Paciente) => p.id.toString() === consulta.paciente.toString()
         );
-        const consultorio = consultoriosData.find((c: Consultorio) => 
-          c.id.toString() === consulta.consultorio.toString()
+        const consultorio = consultoriosData.find(
+          (c: Consultorio) =>
+            c.id.toString() === consulta.consultorio.toString()
         );
-        
+
         return {
           ...consulta,
           id: consulta.id.toString(),
-          paciente_nombre: paciente?.nombre || 'Paciente',
-          paciente_apellido: paciente?.apellido || 'Desconocido',
-          consultorio_direccion: consultorio?.direccion || 'Consultorio'
+          paciente_nombre: paciente?.nombre || "Paciente",
+          paciente_apellido: paciente?.apellido || "Desconocido",
+          consultorio_direccion: consultorio?.direccion || "Consultorio",
         };
       });
 
@@ -130,8 +152,8 @@ const Appointments: React.FC = () => {
       setPacientes(pacientesData);
       setConsultorios(consultoriosData);
     } catch (error) {
-      setError('Error al cargar los datos');
-      console.error('Error loading data:', error);
+      setError("Error al cargar los datos");
+      console.error("Error loading data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -146,36 +168,49 @@ const Appointments: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const url = editingConsulta 
+      const url = editingConsulta
         ? `${API_BASE_URL}/consulta/${editingConsulta.id}/`
         : `${API_BASE_URL}/consulta/`;
-      
+
       const method = editingConsulta ? "PUT" : "POST";
-      
+
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken") || "",
+        },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
-      
+
       if (!response.ok) throw new Error("Error al guardar la consulta");
-      
+
       const savedConsulta = await response.json();
-      
+
       // Enriquecer la consulta guardada
-      const paciente = pacientes.find(p => p.id.toString() === formData.paciente.toString());
-      const consultorio = consultorios.find(c => c.id.toString() === formData.consultorio.toString());
-      
+      const paciente = pacientes.find(
+        (p) => p.id.toString() === formData.paciente.toString()
+      );
+      const consultorio = consultorios.find(
+        (c) => c.id.toString() === formData.consultorio.toString()
+      );
+
       const consultaEnriquecida = {
         ...savedConsulta,
         id: savedConsulta.id.toString(),
-        paciente_nombre: paciente?.nombre || 'Paciente',
-        paciente_apellido: paciente?.apellido || 'Desconocido',
-        consultorio_direccion: consultorio?.direccion || 'Consultorio'
+        paciente_nombre: paciente?.nombre || "Paciente",
+        paciente_apellido: paciente?.apellido || "Desconocido",
+        consultorio_direccion: consultorio?.direccion || "Consultorio",
       };
 
       if (editingConsulta) {
-        setConsultas(consultas.map(c => c.id === editingConsulta.id ? consultaEnriquecida : c));
+        setConsultas(
+          consultas.map((c) =>
+            c.id === editingConsulta.id ? consultaEnriquecida : c
+          )
+        );
       } else {
         setConsultas([...consultas, consultaEnriquecida]);
       }
@@ -195,12 +230,17 @@ const Appointments: React.FC = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/consulta/${id}/`, {
         method: "DELETE",
-        credentials: "include", 
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken") || "",
+        },
       });
-      
+
       if (!response.ok) throw new Error("Error al eliminar");
-      
-      setConsultas(consultas.filter(c => c.id !== id));
+
+      setConsultas(consultas.filter((c) => c.id !== id));
       alert("Consulta eliminada");
     } catch (error) {
       alert(`Error: ${error}`);
@@ -237,7 +277,7 @@ const Appointments: React.FC = () => {
   };
 
   // Filtrar consultas
-  const filteredConsultas = consultas.filter(consulta => {
+  const filteredConsultas = consultas.filter((consulta) => {
     const searchLower = searchQuery.toLowerCase();
     return (
       consulta.paciente_nombre?.toLowerCase().includes(searchLower) ||
@@ -251,13 +291,13 @@ const Appointments: React.FC = () => {
     const fecha = new Date(fechaString);
     return {
       fecha: format(fecha, "dd/MM/yyyy"),
-      hora: format(fecha, "HH:mm")
+      hora: format(fecha, "HH:mm"),
     };
   };
 
   // Obtener consultas por fecha
   const getConsultasByDate = (date: Date) => {
-    return filteredConsultas.filter(consulta => 
+    return filteredConsultas.filter((consulta) =>
       isSameDay(new Date(consulta.fecha), date)
     );
   };
@@ -279,7 +319,7 @@ const Appointments: React.FC = () => {
 
   // Log para verificar que la variable se está usando correctamente
   useEffect(() => {
-    console.log('API Base URL:', API_BASE_URL);
+    console.log("API Base URL:", API_BASE_URL);
   }, []);
 
   if (isLoading) {
@@ -298,7 +338,9 @@ const Appointments: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error al cargar</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Error al cargar
+          </h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <Button onClick={loadData}>Reintentar</Button>
         </div>
@@ -314,35 +356,40 @@ const Appointments: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Consultas</h1>
-              <p className="text-gray-600 mt-1">{consultas.length} consultas programadas</p>
+              <p className="text-gray-600 mt-1">
+                {consultas.length} consultas programadas
+              </p>
             </div>
             <div className="flex items-center space-x-3">
               {/* Toggle de vista */}
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
-                  onClick={() => setViewMode('calendar')}
+                  onClick={() => setViewMode("calendar")}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    viewMode === 'calendar' 
-                      ? 'bg-white text-blue-600 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
+                    viewMode === "calendar"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   <Grid3X3 className="h-4 w-4 mr-2" />
                   Calendario
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    viewMode === 'list' 
-                      ? 'bg-white text-blue-600 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
+                    viewMode === "list"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   <List className="h-4 w-4 mr-2" />
                   Lista
                 </button>
               </div>
-              <Button onClick={() => openModal()} className="bg-blue-600 hover:bg-blue-700">
+              <Button
+                onClick={() => openModal()}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Nueva Consulta
               </Button>
@@ -357,7 +404,10 @@ const Appointments: React.FC = () => {
           <div className="flex">
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                <strong>Debug:</strong> API URL configurada como: <code className="bg-yellow-100 px-1 rounded">{API_BASE_URL}</code>
+                <strong>Debug:</strong> API URL configurada como:{" "}
+                <code className="bg-yellow-100 px-1 rounded">
+                  {API_BASE_URL}
+                </code>
               </p>
             </div>
           </div>
@@ -380,7 +430,7 @@ const Appointments: React.FC = () => {
         </div>
 
         {/* Vista Calendario */}
-        {viewMode === 'calendar' ? (
+        {viewMode === "calendar" ? (
           <div className="bg-white rounded-lg shadow-sm border">
             {/* Header del calendario */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
@@ -411,8 +461,11 @@ const Appointments: React.FC = () => {
 
             {/* Días de la semana */}
             <div className="grid grid-cols-7 border-b border-gray-200">
-              {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
-                <div key={day} className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wide">
+              {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
+                <div
+                  key={day}
+                  className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wide"
+                >
                   {day}
                 </div>
               ))}
@@ -420,43 +473,48 @@ const Appointments: React.FC = () => {
 
             {/* Grid del calendario */}
             <div className="grid grid-cols-7">
-              {getDaysInMonth().map(day => {
+              {getDaysInMonth().map((day) => {
                 const consultasDelDia = getConsultasByDate(day);
                 const esHoy = isToday(day);
-                const estaSeleccionado = selectedDate && isSameDay(day, selectedDate);
-                
+                const estaSeleccionado =
+                  selectedDate && isSameDay(day, selectedDate);
+
                 return (
                   <div
                     key={day.toString()}
                     className={`min-h-[120px] border-r border-b border-gray-100 p-2 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      esHoy ? 'bg-blue-50' : ''
-                    } ${estaSeleccionado ? 'bg-blue-100' : ''}`}
+                      esHoy ? "bg-blue-50" : ""
+                    } ${estaSeleccionado ? "bg-blue-100" : ""}`}
                     onClick={() => setSelectedDate(day)}
                   >
-                    <div className={`text-sm font-medium mb-2 ${
-                      esHoy ? 'text-blue-600' : 'text-gray-900'
-                    }`}>
-                      {format(day, 'd')}
+                    <div
+                      className={`text-sm font-medium mb-2 ${
+                        esHoy ? "text-blue-600" : "text-gray-900"
+                      }`}
+                    >
+                      {format(day, "d")}
                       {esHoy && (
                         <span className="ml-1 inline-block w-2 h-2 bg-blue-600 rounded-full"></span>
                       )}
                     </div>
-                    
+
                     {/* Consultas del día */}
                     <div className="space-y-1">
-                      {consultasDelDia.slice(0, 2).map(consulta => (
+                      {consultasDelDia.slice(0, 2).map((consulta) => (
                         <div
                           key={consulta.id}
                           className={`text-xs p-1 rounded truncate cursor-pointer ${
                             consulta.virtual
-                              ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                              : 'bg-green-100 text-green-800 hover:bg-green-200'
+                              ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                              : "bg-green-100 text-green-800 hover:bg-green-200"
                           }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             openModal(consulta);
                           }}
-                          title={`${consulta.paciente_nombre} ${consulta.paciente_apellido} - ${format(new Date(consulta.fecha), 'HH:mm')}`}
+                          title={`${consulta.paciente_nombre} ${
+                            consulta.paciente_apellido
+                          } - ${format(new Date(consulta.fecha), "HH:mm")}`}
                         >
                           <div className="flex items-center">
                             {consulta.virtual ? (
@@ -465,7 +523,8 @@ const Appointments: React.FC = () => {
                               <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
                             )}
                             <span className="truncate">
-                              {format(new Date(consulta.fecha), 'HH:mm')} {consulta.paciente_nombre}
+                              {format(new Date(consulta.fecha), "HH:mm")}{" "}
+                              {consulta.paciente_nombre}
                             </span>
                           </div>
                         </div>
@@ -488,10 +547,14 @@ const Appointments: React.FC = () => {
               <div className="text-center py-12">
                 <CalendarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {searchQuery ? "No se encontraron consultas" : "No hay consultas programadas"}
+                  {searchQuery
+                    ? "No se encontraron consultas"
+                    : "No hay consultas programadas"}
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  {searchQuery ? "Intenta con otros términos de búsqueda" : "Programa tu primera consulta"}
+                  {searchQuery
+                    ? "Intenta con otros términos de búsqueda"
+                    : "Programa tu primera consulta"}
                 </p>
                 {!searchQuery && (
                   <Button onClick={() => openModal()}>
@@ -517,33 +580,31 @@ const Appointments: React.FC = () => {
                       <Clock className="h-4 w-4 mr-2" />
                       Hora
                     </div>
-                    <div className="col-span-2">
-                      Modalidad
-                    </div>
-                    <div className="col-span-2">
-                      Ubicación
-                    </div>
-                    <div className="col-span-1 text-center">
-                      Acciones
-                    </div>
+                    <div className="col-span-2">Modalidad</div>
+                    <div className="col-span-2">Ubicación</div>
+                    <div className="col-span-1 text-center">Acciones</div>
                   </div>
                 </div>
 
                 {/* Filas de la tabla */}
                 <div className="divide-y divide-gray-100">
                   {filteredConsultas
-                    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+                    .sort(
+                      (a, b) =>
+                        new Date(a.fecha).getTime() -
+                        new Date(b.fecha).getTime()
+                    )
                     .map((consulta) => {
                       const { fecha, hora } = formatFecha(consulta.fecha);
                       const fechaConsulta = new Date(consulta.fecha);
                       const ahora = new Date();
                       const esPasada = fechaConsulta < ahora;
-                      
+
                       return (
-                        <div 
-                          key={consulta.id} 
+                        <div
+                          key={consulta.id}
                           className={`px-6 py-4 hover:bg-gray-50 transition-colors ${
-                            esPasada ? 'bg-gray-50/50 opacity-75' : ''
+                            esPasada ? "bg-gray-50/50 opacity-75" : ""
                           }`}
                         >
                           <div className="grid grid-cols-12 gap-4 items-center">
@@ -551,14 +612,18 @@ const Appointments: React.FC = () => {
                             <div className="col-span-3">
                               <div className="flex items-center">
                                 <div className="flex-shrink-0 h-10 w-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-semibold text-sm">
-                                  {consulta.paciente_nombre?.[0]?.toUpperCase()}{consulta.paciente_apellido?.[0]?.toUpperCase()}
+                                  {consulta.paciente_nombre?.[0]?.toUpperCase()}
+                                  {consulta.paciente_apellido?.[0]?.toUpperCase()}
                                 </div>
                                 <div className="ml-3">
                                   <p className="text-sm font-medium text-gray-900">
-                                    {consulta.paciente_nombre} {consulta.paciente_apellido}
+                                    {consulta.paciente_nombre}{" "}
+                                    {consulta.paciente_apellido}
                                   </p>
                                   {esPasada && (
-                                    <p className="text-xs text-gray-500">Consulta realizada</p>
+                                    <p className="text-xs text-gray-500">
+                                      Consulta realizada
+                                    </p>
                                   )}
                                 </div>
                               </div>
@@ -566,7 +631,9 @@ const Appointments: React.FC = () => {
 
                             {/* Fecha */}
                             <div className="col-span-2">
-                              <p className="text-sm font-medium text-gray-900">{fecha}</p>
+                              <p className="text-sm font-medium text-gray-900">
+                                {fecha}
+                              </p>
                               <p className="text-xs text-gray-500">
                                 {format(fechaConsulta, "EEEE", { locale: es })}
                               </p>
@@ -574,19 +641,23 @@ const Appointments: React.FC = () => {
 
                             {/* Hora */}
                             <div className="col-span-2">
-                              <p className="text-sm font-medium text-gray-900">{hora}</p>
+                              <p className="text-sm font-medium text-gray-900">
+                                {hora}
+                              </p>
                               <p className="text-xs text-gray-500">
-                                {esPasada ? 'Finalizada' : 'Programada'}
+                                {esPasada ? "Finalizada" : "Programada"}
                               </p>
                             </div>
 
                             {/* Modalidad */}
                             <div className="col-span-2">
-                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                consulta.virtual 
-                                  ? "bg-blue-100 text-blue-800" 
-                                  : "bg-green-100 text-green-800"
-                              }`}>
+                              <span
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                  consulta.virtual
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-green-100 text-green-800"
+                                }`}
+                              >
                                 {consulta.virtual ? (
                                   <>
                                     <Video className="h-3 w-3 mr-1" />
@@ -605,9 +676,14 @@ const Appointments: React.FC = () => {
                             <div className="col-span-2">
                               <p className="text-sm text-gray-700">
                                 {consulta.virtual ? (
-                                  <span className="text-blue-600 font-medium">Videollamada</span>
+                                  <span className="text-blue-600 font-medium">
+                                    Videollamada
+                                  </span>
                                 ) : (
-                                  <span className="truncate" title={consulta.consultorio_direccion}>
+                                  <span
+                                    className="truncate"
+                                    title={consulta.consultorio_direccion}
+                                  >
                                     📍 {consulta.consultorio_direccion}
                                   </span>
                                 )}
@@ -641,11 +717,33 @@ const Appointments: React.FC = () => {
                 <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
                   <div className="flex justify-between items-center text-sm text-gray-600">
                     <span>
-                      Total: {filteredConsultas.length} consulta{filteredConsultas.length !== 1 ? 's' : ''}
+                      Total: {filteredConsultas.length} consulta
+                      {filteredConsultas.length !== 1 ? "s" : ""}
                     </span>
                     <span>
-                      {filteredConsultas.filter(c => new Date(c.fecha) > new Date()).length} pendiente{filteredConsultas.filter(c => new Date(c.fecha) > new Date()).length !== 1 ? 's' : ''} • {' '}
-                      {filteredConsultas.filter(c => new Date(c.fecha) < new Date()).length} realizada{filteredConsultas.filter(c => new Date(c.fecha) < new Date()).length !== 1 ? 's' : ''}
+                      {
+                        filteredConsultas.filter(
+                          (c) => new Date(c.fecha) > new Date()
+                        ).length
+                      }{" "}
+                      pendiente
+                      {filteredConsultas.filter(
+                        (c) => new Date(c.fecha) > new Date()
+                      ).length !== 1
+                        ? "s"
+                        : ""}{" "}
+                      •{" "}
+                      {
+                        filteredConsultas.filter(
+                          (c) => new Date(c.fecha) < new Date()
+                        ).length
+                      }{" "}
+                      realizada
+                      {filteredConsultas.filter(
+                        (c) => new Date(c.fecha) < new Date()
+                      ).length !== 1
+                        ? "s"
+                        : ""}
                     </span>
                   </div>
                 </div>
@@ -655,27 +753,36 @@ const Appointments: React.FC = () => {
         )}
 
         {/* Panel lateral para fecha seleccionada (solo en vista calendario) */}
-        {viewMode === 'calendar' && selectedDate && (
+        {viewMode === "calendar" && selectedDate && (
           <div className="mt-6 bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Consultas del {format(selectedDate, "d 'de' MMMM, yyyy", { locale: es })}
+              Consultas del{" "}
+              {format(selectedDate, "d 'de' MMMM, yyyy", { locale: es })}
             </h3>
             {getConsultasByDate(selectedDate).length === 0 ? (
-              <p className="text-gray-500">No hay consultas programadas para este día.</p>
+              <p className="text-gray-500">
+                No hay consultas programadas para este día.
+              </p>
             ) : (
               <div className="space-y-3">
-                {getConsultasByDate(selectedDate).map(consulta => (
-                  <div key={consulta.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                {getConsultasByDate(selectedDate).map((consulta) => (
+                  <div
+                    key={consulta.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0 h-8 w-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-semibold text-xs">
-                        {consulta.paciente_nombre?.[0]?.toUpperCase()}{consulta.paciente_apellido?.[0]?.toUpperCase()}
+                        {consulta.paciente_nombre?.[0]?.toUpperCase()}
+                        {consulta.paciente_apellido?.[0]?.toUpperCase()}
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">
-                          {consulta.paciente_nombre} {consulta.paciente_apellido}
+                          {consulta.paciente_nombre}{" "}
+                          {consulta.paciente_apellido}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {format(new Date(consulta.fecha), 'HH:mm')} • {consulta.virtual ? 'Virtual' : 'Presencial'}
+                          {format(new Date(consulta.fecha), "HH:mm")} •{" "}
+                          {consulta.virtual ? "Virtual" : "Presencial"}
                         </p>
                       </div>
                     </div>
@@ -719,7 +826,7 @@ const Appointments: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="px-6 py-4 space-y-4">
               {/* Paciente */}
               <div>
@@ -728,7 +835,12 @@ const Appointments: React.FC = () => {
                 </label>
                 <select
                   value={formData.paciente}
-                  onChange={(e) => setFormData({...formData, paciente: Number(e.target.value)})}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      paciente: Number(e.target.value),
+                    })
+                  }
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isSubmitting}
                 >
@@ -749,7 +861,9 @@ const Appointments: React.FC = () => {
                 <input
                   type="datetime-local"
                   value={formData.fecha}
-                  onChange={(e) => setFormData({...formData, fecha: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fecha: e.target.value })
+                  }
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isSubmitting}
                 />
@@ -765,7 +879,9 @@ const Appointments: React.FC = () => {
                     <input
                       type="radio"
                       checked={!formData.virtual}
-                      onChange={() => setFormData({...formData, virtual: false})}
+                      onChange={() =>
+                        setFormData({ ...formData, virtual: false })
+                      }
                       className="mr-2"
                       disabled={isSubmitting}
                     />
@@ -775,7 +891,9 @@ const Appointments: React.FC = () => {
                     <input
                       type="radio"
                       checked={formData.virtual}
-                      onChange={() => setFormData({...formData, virtual: true})}
+                      onChange={() =>
+                        setFormData({ ...formData, virtual: true })
+                      }
                       className="mr-2"
                       disabled={isSubmitting}
                     />
@@ -792,12 +910,20 @@ const Appointments: React.FC = () => {
                   </label>
                   <select
                     value={formData.consultorio}
-                    onChange={(e) => setFormData({...formData, consultorio: Number(e.target.value)})}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        consultorio: Number(e.target.value),
+                      })
+                    }
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     disabled={isSubmitting}
                   >
                     {consultorios.map((consultorio) => (
-                      <option key={consultorio.id} value={Number(consultorio.id)}>
+                      <option
+                        key={consultorio.id}
+                        value={Number(consultorio.id)}
+                      >
                         {consultorio.direccion}
                       </option>
                     ))}
@@ -807,14 +933,14 @@ const Appointments: React.FC = () => {
             </div>
 
             <div className="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={closeModal}
                 disabled={isSubmitting}
               >
                 Cancelar
               </Button>
-              <Button 
+              <Button
                 onClick={saveConsulta}
                 isLoading={isSubmitting}
                 className="bg-blue-600 hover:bg-blue-700"

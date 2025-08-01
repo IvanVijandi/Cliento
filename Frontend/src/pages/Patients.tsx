@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import {
   Search,
   Plus,
@@ -43,9 +44,19 @@ interface NewPatient {
   altura: number;
   peso: number;
 }
-const API_BASE_URL = import.meta.env.VITE_API_URL ;
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+function getCookie(name: string): string | null {
+  const cookies = document.cookie ? document.cookie.split("; ") : [];
+  for (let cookie of cookies) {
+    const [key, value] = cookie.split("=");
+    if (key === name) return decodeURIComponent(value);
+  }
+  return null;
+}
 
 const Patients: React.FC = () => {
+  console.log(getCookie("csrftoken"));
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -71,7 +82,11 @@ const Patients: React.FC = () => {
     setError(null);
     try {
       const response = await fetch(`${API_BASE_URL}/paciente/`, {
-        credentials: "include" // Incluir cookies para sesión
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken") || "",
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
         throw new Error("Error al obtener los pacientes");
@@ -93,16 +108,17 @@ const Patients: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken") || "",
         },
         body: JSON.stringify(patientData),
-        credentials: "include" 
+        credentials: "include",
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al crear el paciente");
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error("Error creating patient:", error);
@@ -117,16 +133,17 @@ const Patients: React.FC = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken") || "",
         },
         body: JSON.stringify(patientData),
-        credentials: "include" 
+        credentials: "include",
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al actualizar el paciente");
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error("Error updating patient:", error);
@@ -136,12 +153,16 @@ const Patients: React.FC = () => {
 
   // Función para eliminar un paciente
   const deletePatient = async (id: string) => {
+    console.log("csrfToken", csrfToken);
     try {
       const response = await fetch(`${API_BASE_URL}/paciente/${id}/`, {
         method: "DELETE",
-        credentials: "include" 
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken") || "",
+        },
+        credentials: "include",
       });
-      
+
       if (!response.ok) {
         throw new Error("Error al eliminar el paciente");
       }
@@ -169,7 +190,12 @@ const Patients: React.FC = () => {
 
   // Manejar agregar nuevo paciente
   const handleAddPatient = async () => {
-    if (!newPatient.nombre || !newPatient.apellido || !newPatient.email || !newPatient.dni) {
+    if (
+      !newPatient.nombre ||
+      !newPatient.apellido ||
+      !newPatient.email ||
+      !newPatient.dni
+    ) {
       alert("Por favor, complete todos los campos obligatorios");
       return;
     }
@@ -204,7 +230,10 @@ const Patients: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const updatedPatient = await updatePatient(editingPatient.id, editingPatient);
+      const updatedPatient = await updatePatient(
+        editingPatient.id,
+        editingPatient
+      );
       setPatients(
         patients.map((p) => (p.id === editingPatient.id ? updatedPatient : p))
       );
@@ -219,7 +248,9 @@ const Patients: React.FC = () => {
 
   // Manejar eliminar paciente
   const handleDeletePatient = async (id: string) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar este paciente?")) {
+    if (
+      !window.confirm("¿Estás seguro de que quieres eliminar este paciente?")
+    ) {
       return;
     }
 
@@ -239,11 +270,14 @@ const Patients: React.FC = () => {
     const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
       age--;
     }
-    
+
     return `${age} años`;
   };
 
@@ -263,7 +297,9 @@ const Patients: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error al cargar pacientes</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Error al cargar pacientes
+          </h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <Button onClick={fetchPatients}>Reintentar</Button>
         </div>
@@ -313,11 +349,13 @@ const Patients: React.FC = () => {
             <div className="text-center py-12">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {searchQuery ? "No se encontraron pacientes" : "No hay pacientes registrados"}
+                {searchQuery
+                  ? "No se encontraron pacientes"
+                  : "No hay pacientes registrados"}
               </h3>
               <p className="text-gray-600 mb-4">
-                {searchQuery 
-                  ? "Intenta con otros términos de búsqueda" 
+                {searchQuery
+                  ? "Intenta con otros términos de búsqueda"
                   : "Comienza agregando tu primer paciente"}
               </p>
               {!searchQuery && (
@@ -357,7 +395,8 @@ const Patients: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 bg-primary text-white rounded-full flex items-center justify-center">
-                          {patient.nombre[0]}{patient.apellido[0]}
+                          {patient.nombre[0]}
+                          {patient.apellido[0]}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
@@ -387,15 +426,17 @@ const Patients: React.FC = () => {
                         {calculateAge(patient.fecha_nacimiento)}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {patient.fecha_nacimiento 
-                          ? new Date(patient.fecha_nacimiento).toLocaleDateString('es-ES')
-                          : "Sin fecha"
-                        }
+                        {patient.fecha_nacimiento
+                          ? new Date(
+                              patient.fecha_nacimiento
+                            ).toLocaleDateString("es-ES")
+                          : "Sin fecha"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {patient.altura > 0 ? `${patient.altura}m` : "-"} / {patient.peso > 0 ? `${patient.peso}kg` : "-"}
+                        {patient.altura > 0 ? `${patient.altura}m` : "-"} /{" "}
+                        {patient.peso > 0 ? `${patient.peso}kg` : "-"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -532,7 +573,10 @@ const Patients: React.FC = () => {
                     label="Dirección"
                     value={newPatient.direccion}
                     onChange={(e) =>
-                      setNewPatient({ ...newPatient, direccion: e.target.value })
+                      setNewPatient({
+                        ...newPatient,
+                        direccion: e.target.value,
+                      })
                     }
                     placeholder="Calle, número, ciudad..."
                     disabled={isSubmitting}
@@ -541,17 +585,14 @@ const Patients: React.FC = () => {
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowAddModal(false)}
                 disabled={isSubmitting}
               >
                 Cancelar
               </Button>
-              <Button 
-                onClick={handleAddPatient}
-                isLoading={isSubmitting}
-              >
+              <Button onClick={handleAddPatient} isLoading={isSubmitting}>
                 Guardar
               </Button>
             </div>
@@ -688,17 +729,14 @@ const Patients: React.FC = () => {
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setEditingPatient(null)}
                 disabled={isSubmitting}
               >
                 Cancelar
               </Button>
-              <Button 
-                onClick={handleUpdatePatient}
-                isLoading={isSubmitting}
-              >
+              <Button onClick={handleUpdatePatient} isLoading={isSubmitting}>
                 Guardar cambios
               </Button>
             </div>
