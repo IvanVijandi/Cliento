@@ -76,6 +76,7 @@ const getCSRFtoken = (): string | null => {
 const Appointments: React.FC = () => {
   
   const API_BASE_URL = import.meta.env.VITE_API_URL ;
+  console.log(getCSRFtoken());
 
   const [consultas, setConsultas] = useState<Consulta[]>([]);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
@@ -174,6 +175,7 @@ const Appointments: React.FC = () => {
       
       const response = await fetch(url, {
         method,
+        credentials: 'include',
         headers: { "Content-Type": "application/json",
           "X-CSRFToken": getCSRFtoken() || "",    
          },
