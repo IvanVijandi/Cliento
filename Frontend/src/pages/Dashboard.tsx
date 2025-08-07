@@ -188,15 +188,26 @@ const Dashboard: React.FC = () => {
 
   // Función para manejar el logout
   const handleLogout = async () => {
- 
-    await fetch(`${API_BASE_URL}/logout/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCSRFTokenFromCookie() || "",
-      },
-      credentials: 'include',
-    });
+    try {
+      // Llamar al endpoint de logout del backend
+      await fetch(`${API_BASE_URL}/logout/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+      });
+      
+      // Limpiar datos locales si tienes
+      localStorage.clear();
+      sessionStorage.clear();
+      
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    } finally {
+      
+      navigate('/login');
+    }
   };
 
   if (isLoading) {
