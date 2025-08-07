@@ -57,16 +57,23 @@ interface EstadisticasDashboard {
 }
 
 
-//csrf token
-const getCSRFToken = () => {
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'csrftoken') {
-      return value; 
+const getCSRFTokenFromCookie = (): string | null => {
+  const name = 'csrftoken';
+  let cookieValue = null;
+  
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
   }
-  return null;
+  
+  return cookieValue;
 };
 
 
@@ -94,6 +101,7 @@ const Dashboard: React.FC = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFTokenFromCookie() || "",
         },
         credentials: 'include',
       });
@@ -180,15 +188,14 @@ const Dashboard: React.FC = () => {
 
   // Función para manejar el logout
   const handleLogout = async () => {
-    const csrfToken = getCSRFToken();
-
+ 
     await fetch(`${API_BASE_URL}/logout/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {}),
+        'X-CSRFToken': getCSRFTokenFromCookie() || "",
       },
-      credentials: 'include', 
+      credentials: 'include',
     });
   };
 
