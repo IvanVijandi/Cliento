@@ -1,4 +1,4 @@
-##Levantamos ambos contenedores frontend + backedn
+##Levantamos ambos contenedores frontend + backend + db
 version: '3.8'
 
 services:
@@ -26,6 +26,34 @@ services:
       - ./Backend/Cliento:/app
     environment:
       - DJANGO_SETTINGS_MODULE=Cliento.settings
+      - POSTGRES_DB=${POSTGRES_DB}          
+      - POSTGRES_USER=${POSTGRES_USER}    
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+    depends_on:
+      - db
+    
+  db:
+    image: postgres:17
+    container_name: cliento_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}        
+      POSTGRES_USER: ${POSTGRES_USER}      
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}     
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:80
+
 
 volumes:
   node_modules:
+  postgres_data:

@@ -56,6 +56,20 @@ interface EstadisticasDashboard {
   alertasImportantes: number;
 }
 
+
+//csrf token
+const getCSRFToken = () => {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'csrftoken') {
+      return value; 
+    }
+  }
+  return null;
+};
+
+
 const Dashboard: React.FC = () => {
   // Variable de entorno para la API
   const API_BASE_URL = import.meta.env.VITE_API_URL ;
@@ -163,29 +177,19 @@ const Dashboard: React.FC = () => {
     cargarDatosDashboard();
   }, []);
  
+
   // Función para manejar el logout
-  const handleLogout = () => {
-    fetch(`${API_BASE_URL}/logout/`, {
+  const handleLogout = async () => {
+    const csrfToken = getCSRFToken();
+
+    await fetch(`${API_BASE_URL}/logout/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {}),
       },
-      credentials: 'include',
-    })
-      .then(response => {
-        if (response.ok) {
-          console.log("Logout successful");
-          navigate('/login');
-        } else {
-          console.error("Logout failed:", response.statusText);
-          alert("Error al cerrar sesión. Por favor, inténtalo de nuevo.");
-        }
-      })
-      .catch(error => {
-        console.error("Error en la solicitud de logout:", error);
-        alert("Ocurrió un error al cerrar sesión. Por favor, inténtalo más tarde.");
-      });
-    navigate('/login');
+      credentials: 'include', 
+    });
   };
 
   if (isLoading) {
