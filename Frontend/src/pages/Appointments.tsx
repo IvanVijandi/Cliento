@@ -53,6 +53,25 @@ interface NewConsulta {
   paciente: number;
   virtual: boolean;
 }
+const getCSRFtoken = (): string | null => {
+  const name = 'csrftoken';
+  let cookieValue = null;
+  
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  
+  return cookieValue;
+};
+
 
 const Appointments: React.FC = () => {
   
@@ -86,6 +105,7 @@ const Appointments: React.FC = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFtoken() || "",
         },
         credentials: 'include',
       });
@@ -154,7 +174,9 @@ const Appointments: React.FC = () => {
       
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFtoken() || "",    
+         },
         body: JSON.stringify(formData),
       });
       
@@ -196,6 +218,9 @@ const Appointments: React.FC = () => {
       const response = await fetch(`${API_BASE_URL}/consulta/${id}/`, {
         method: "DELETE",
         credentials: "include", 
+        headers: {
+          "X-CSRFToken": getCSRFtoken() || "",
+        }
       });
       
       if (!response.ok) throw new Error("Error al eliminar");

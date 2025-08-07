@@ -45,7 +45,29 @@ interface NewPatient {
 }
 const API_BASE_URL = import.meta.env.VITE_API_URL ;
 
+
+const getCSRFtoken = (): string | null => {
+  const name = 'csrftoken';
+  let cookieValue = null;
+  
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  
+  return cookieValue;
+};
+
+
 const Patients: React.FC = () => {
+  console.log(getCSRFtoken());
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -71,7 +93,10 @@ const Patients: React.FC = () => {
     setError(null);
     try {
       const response = await fetch(`${API_BASE_URL}/paciente/`, {
-        credentials: "include" // Incluir cookies para sesión
+        credentials: "include", // Incluir cookies para sesión
+        headers: {
+          "X-CSRFToken": getCSRFtoken() || "",
+        }
       });
       if (!response.ok) {
         throw new Error("Error al obtener los pacientes");
@@ -93,6 +118,7 @@ const Patients: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFtoken() || "",
         },
         body: JSON.stringify(patientData),
         credentials: "include" 
@@ -117,6 +143,7 @@ const Patients: React.FC = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFtoken() || "",
         },
         body: JSON.stringify(patientData),
         credentials: "include" 
@@ -139,7 +166,10 @@ const Patients: React.FC = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/paciente/${id}/`, {
         method: "DELETE",
-        credentials: "include" 
+        credentials: "include", 
+        headers: {
+          "X-CSRFToken": getCSRFtoken() || "",
+        } 
       });
       
       if (!response.ok) {
