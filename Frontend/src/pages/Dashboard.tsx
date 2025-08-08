@@ -44,9 +44,11 @@ interface Consulta {
   virtual: boolean;
 }
 
-interface Ficha {
+interface Nota {
   id: string;
-  paciente: number;
+  contenido: string;
+  fecha_creacion: string;
+  consulta: string;
 }
 
 interface EstadisticasDashboard {
@@ -143,12 +145,12 @@ const Dashboard: React.FC = () => {
         profesionalesData,
         pacientesData,
         consultasData,
-        fichasData
+        notasData
       ] = await Promise.all([
         fetchData('profesional'),
         fetchData('paciente'),
         fetchData('consulta'),
-        fetchData('ficha')
+        fetchData('nota')
       ]);
 
       // Establecer datos de pacientes
@@ -162,7 +164,7 @@ const Dashboard: React.FC = () => {
       // Calcular estadísticas
       const pacientesActivos = pacientesData.length;
       const citasEstaSemana = filterConsultasThisWeek(consultasData).length;
-      const notasPendientes = fichasData.length;
+      const notasPendientes = notasData.length;
       const alertasImportantes = Math.floor(Math.random() * 3) + 1; // Simulado
 
       setEstadisticas({
@@ -355,7 +357,7 @@ const Dashboard: React.FC = () => {
                   <ClipboardList className="h-8 w-8 text-primary" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Fichas creadas</p>
+                  <p className="text-sm font-medium text-gray-500">Notas creadas</p>
                   <p className="text-3xl font-bold text-gray-900">{estadisticas.notasPendientes}</p>
                 </div>
               </div>
@@ -394,7 +396,7 @@ const Dashboard: React.FC = () => {
                 <div className="bg-purple-50 rounded-lg p-4 mb-2">
                   <span className="block text-2xl font-bold text-purple-600">{estadisticas.notasPendientes}</span>
                 </div>
-                <span className="text-sm text-gray-600">Fichas registradas</span>
+                <span className="text-sm text-gray-600">Notas registradas</span>
               </div>
               <div className="text-center">
                 <div className="bg-orange-50 rounded-lg p-4 mb-2">

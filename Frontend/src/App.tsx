@@ -9,6 +9,7 @@ const Register = lazy(() => import("./pages/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Patients = lazy(() => import("./pages/Patients"));
 const Appointments = lazy(() => import("./pages/Appointments"));
+const Notes = lazy(() => import("./pages/Notes"));
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/patients" element={<Patients />} />
           <Route path="/appointments" element={<Appointments />} />
+          <Route path="/notes" element={<Notes />} />
         </Route>
       </Routes>
     </Suspense>

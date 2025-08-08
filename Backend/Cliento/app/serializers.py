@@ -1,4 +1,4 @@
-from .models import Profesional, Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha
+from .models import Profesional, Consultorio, Paciente, Consulta, Nota
 from rest_framework import serializers
 
 
@@ -8,10 +8,6 @@ class ProfesionalSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 
-class EspecialidadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Especialidad
-        fields = '__all__'
 
 class ConsultorioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,18 +24,8 @@ class ConsultaSerializer(serializers.ModelSerializer):
         model = Consulta
         fields = '__all__'
 
-class TrastornoSerializer(serializers.ModelSerializer):
+
+class NotaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Trastorno
+        model = Nota
         fields = '__all__'
-
-class DrogaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Droga
-        fields = '__all__'
-
-class FichaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ficha
-        fields = '__all__' 
-

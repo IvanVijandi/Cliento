@@ -52,3 +52,35 @@ export interface User {
   email: string;
   role: 'admin' | 'practitioner';
 }
+
+export interface Note {
+  id: number;
+  contenido: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+  consulta: number;
+  paciente_nombre: string;
+  paciente_apellido: string;
+  paciente_id: number;
+  fecha_consulta: string;
+}
+
+export interface Paciente {
+  id: number;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  fecha_nacimiento: string;
+  telefono: string;
+  email: string;
+  direccion: string;
+}
+
+export interface Consulta {
+  id: number;
+  fecha: string;
+  profesional: number;
+  consultorio: number;
+  paciente: number;
+  virtual: boolean;
+}

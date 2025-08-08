@@ -1,11 +1,7 @@
 from datetime import datetime
 from django.contrib.auth.models import User
-from .models import Profesional, Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha
-
+from .models import Profesional, Consultorio, Paciente, Consulta
 def run():
-    # Crear especialidades
-    especialidad1 = Especialidad.objects.create(nombre="Psicología", descripcion="Especialidad en psicología clínica")
-    especialidad2 = Especialidad.objects.create(nombre="Psiquiatría", descripcion="Especialidad en psiquiatría")
 
     # Crear usuarios de Django primero
     user1 = User.objects.create_user(username="juan@gmail.com", email="juan@gmail.com", password="12345678")
@@ -50,17 +46,5 @@ def run():
     consulta2 = Consulta.objects.create(
         fecha=datetime.now(), profesional=profesional2, consultorio=consultorio2, paciente=paciente2, virtual=True
     )
-
-    # Crear trastornos
-    trastorno1 = Trastorno.objects.create(nombre="Ansiedad", descripcion="Trastorno de ansiedad generalizada", paciente=paciente1)
-    trastorno2 = Trastorno.objects.create(nombre="Depresión", descripcion="Trastorno depresivo mayor", paciente=paciente2)
-
-    # Crear drogas
-    droga1 = Droga.objects.create(nombre="Paracetamol", descripcion="Analgésico", fabricante="Laboratorio X", paciente=paciente1)
-    droga2 = Droga.objects.create(nombre="Ibuprofeno", descripcion="Antiinflamatorio", fabricante="Laboratorio Y", paciente=paciente2)
-
-    # Crear fichas
-    ficha1 = Ficha.objects.create(paciente=paciente1)
-    ficha2 = Ficha.objects.create(paciente=paciente2)
 
     print("Datos de prueba creados exitosamente.")

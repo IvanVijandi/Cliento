@@ -1,11 +1,15 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .models import Profesional, Especialidad, Consultorio, Paciente, Consulta, Trastorno, Droga, Ficha
-from .serializers import ProfesionalSerializer, EspecialidadSerializer, ConsultorioSerializer, PacienteSerializer, ConsultaSerializer, TrastornoSerializer, DrogaSerializer, FichaSerializer
+from .models import Profesional, Consultorio, Paciente, Consulta, Nota
+from .serializers import ProfesionalSerializer, ConsultorioSerializer, PacienteSerializer, ConsultaSerializer, NotaSerializer
 from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.models import User 
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 
 
 ##Clases de Vista viewsets | son como los controladores de Django pero para API REST
@@ -15,11 +19,6 @@ from rest_framework.permissions import IsAuthenticated
 class Profesional(viewsets.ModelViewSet):
     queryset = Profesional.objects.all()
     serializer_class = ProfesionalSerializer
-    permission_classes = [IsAuthenticated]
-
-class Especialidad(viewsets.ModelViewSet):
-    queryset = Especialidad.objects.all()
-    serializer_class = EspecialidadSerializer
     permission_classes = [IsAuthenticated]
 
 class Consultorio(viewsets.ModelViewSet):
@@ -37,19 +36,10 @@ class Consulta(viewsets.ModelViewSet):
     serializer_class = ConsultaSerializer
     permission_classes = [IsAuthenticated]
 
-class Trastorno(viewsets.ModelViewSet):
-    queryset = Trastorno.objects.all()
-    serializer_class = TrastornoSerializer
-    permission_classes = [IsAuthenticated]
 
-class Droga(viewsets.ModelViewSet):
-    queryset = Droga.objects.all()
-    serializer_class = DrogaSerializer
-    permission_classes = [IsAuthenticated]
-
-class Ficha(viewsets.ModelViewSet):
-    queryset = Ficha.objects.all()
-    serializer_class = FichaSerializer
+class Nota(viewsets.ModelViewSet):
+    queryset = Nota.objects.all()
+    serializer_class = NotaSerializer
     permission_classes = [IsAuthenticated]
 
 
@@ -119,3 +109,5 @@ class verifySession(APIView):
     def get(self, request):
         user = request.user
         return Response({"message": "Sesión activa", "user": user.username}, status=200)
+
+

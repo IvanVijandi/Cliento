@@ -18,12 +18,6 @@ class Profesional(models.Model):
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.matricula})"
 
-
-
-class Especialidad(models.Model):
-    id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
    
 class Consultorio(models.Model):
     id = models.AutoField(primary_key=True)
@@ -44,6 +38,13 @@ class Paciente(models.Model):
     peso = models.FloatField()
    
 
+class Nota(models.Model):
+    id = models.AutoField(primary_key=True)
+    contenido = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    consulta = models.ForeignKey('Consulta', on_delete=models.CASCADE, related_name='notas')
+    
 class Consulta(models.Model):
     id = models.AutoField(primary_key=True)
     fecha = models.DateTimeField()
@@ -51,25 +52,3 @@ class Consulta(models.Model):
     consultorio = models.ForeignKey(Consultorio, on_delete=models.CASCADE, related_name='consultas')
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='consultas')
     virtual = models.BooleanField(default=False)
-    
-class Trastorno(models.Model):
-    id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='trastornos')
-
-class Droga(models.Model):
-    id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
-    fabricante = models.CharField(max_length=100)
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='drogas')
-
-##Ficha a ver!
-class Ficha(models.Model):
-    id = models.AutoField(primary_key=True)
-    paciente = models.OneToOneField(Paciente, on_delete=models.CASCADE, related_name='ficha')
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
-    
-    
