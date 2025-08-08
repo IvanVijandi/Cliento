@@ -374,7 +374,7 @@ const Notes: React.FC = () => {
               Gestiona las notas de las consultas de tus pacientes
               {selectedPatient && (
                 <span className="block text-sm text-blue-600 mt-1">
-                  📍 Filtrado por: {patients.find(p => p.id === selectedPatient)?.nombre || 'Paciente'} ({selectedPatient})
+                  Filtrado por: {patients.find(p => p.id === selectedPatient)?.nombre || 'Paciente'} ({selectedPatient})
                 </span>
               )}
             </p>
