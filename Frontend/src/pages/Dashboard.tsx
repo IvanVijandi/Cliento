@@ -55,7 +55,6 @@ interface EstadisticasDashboard {
   pacientesActivos: number;
   citasEstaSemana: number;
   notasPendientes: number;
-  alertasImportantes: number;
 }
 
 
@@ -88,7 +87,6 @@ const Dashboard: React.FC = () => {
     pacientesActivos: 0,
     citasEstaSemana: 0,
     notasPendientes: 0,
-    alertasImportantes: 0,
   });
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -165,13 +163,11 @@ const Dashboard: React.FC = () => {
       const pacientesActivos = pacientesData.length;
       const citasEstaSemana = filterConsultasThisWeek(consultasData).length;
       const notasPendientes = notasData.length;
-      const alertasImportantes = Math.floor(Math.random() * 3) + 1; // Simulado
 
       setEstadisticas({
         pacientesActivos,
         citasEstaSemana,
         notasPendientes,
-        alertasImportantes
       });
 
     } catch (error) {
@@ -362,18 +358,6 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <AlertCircle className="h-8 w-8 text-primary" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Alertas pendientes</p>
-                  <p className="text-3xl font-bold text-gray-900">{estadisticas.alertasImportantes}</p>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Resumen estadístico único */}
@@ -397,12 +381,6 @@ const Dashboard: React.FC = () => {
                   <span className="block text-2xl font-bold text-purple-600">{estadisticas.notasPendientes}</span>
                 </div>
                 <span className="text-sm text-gray-600">Notas registradas</span>
-              </div>
-              <div className="text-center">
-                <div className="bg-orange-50 rounded-lg p-4 mb-2">
-                  <span className="block text-2xl font-bold text-orange-600">{estadisticas.alertasImportantes}</span>
-                </div>
-                <span className="text-sm text-gray-600">Alertas pendientes</span>
               </div>
             </div>
           </div>

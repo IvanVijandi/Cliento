@@ -156,29 +156,15 @@ const Register: React.FC = () => {
                 {...register('email')}
               />
               
-              <div className="relative">
-                <Input
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  error={errors.password?.message}
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
+              <Input
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                error={errors.password?.message}
+                {...register('password')}
+              />
               
               {password.length > 0 && (
                 <div className="space-y-2">
@@ -215,29 +201,15 @@ const Register: React.FC = () => {
                 </div>
               )}
               
-              <div className="relative">
-                <Input
-                  label="Confirm password"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  error={errors.confirmPassword?.message}
-                  {...register('confirmPassword')}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  tabIndex={-1}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
+              <Input
+                label="Confirm password"
+                type="password"
+                id="confirmPassword"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                error={errors.confirmPassword?.message}
+                {...register('confirmPassword')}
+              />
               
               <Input
                 label="Matricula"
