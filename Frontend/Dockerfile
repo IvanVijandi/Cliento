@@ -1,22 +1,17 @@
 FROM node:18-alpine
 
-
-ENV NODE_ENV=development
-
-
 WORKDIR /app
-
 
 COPY package*.json ./
 
-
 RUN npm install
-
 
 COPY . .
 
+RUN npm run build
 
-EXPOSE 5173
+RUN npm install -g serve
 
+EXPOSE 4173
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["serve", "-s", "dist", "-l", "4173"]

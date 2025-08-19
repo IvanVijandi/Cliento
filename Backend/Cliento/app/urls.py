@@ -1,17 +1,17 @@
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
 ##Vistas de modelos
-from .views import Consultorio, Paciente, Consulta, Nota, Profesional
+from .views import ConsultorioView, PacienteView, ConsultaView, NotaView, ProfesionalView
 ##Vistas de autenticacion
 from .views import LoginView, RegisterView, LogoutView, verifySession
 
 
 router = DefaultRouter()
-router.register(r'profesional', Profesional, basename='profesional')
-router.register(r'consultorio', Consultorio, basename='consultorio')
-router.register(r'paciente', Paciente, basename='paciente')
-router.register(r'consulta', Consulta, basename='consulta')
-router.register(r'nota', Nota, basename='nota')
+router.register(r'profesional', ProfesionalView, basename='profesional')
+router.register(r'consultorio', ConsultorioView, basename='consultorio')
+router.register(r'paciente', PacienteView, basename='paciente')
+router.register(r'consulta', ConsultaView, basename='consulta')
+router.register(r'nota', NotaView, basename='nota')
 
 urlpatterns = [
     path('', include(router.urls)),

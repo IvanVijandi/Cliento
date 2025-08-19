@@ -25,8 +25,6 @@ SECRET_KEY = 'django-insecure-%8%yo_4r0g#d!uu%w_1)10g6cpqqt5=6kn!$wt+4wxwmub)n1#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -53,14 +51,24 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+##Host
+ALLOWED_HOSTS = []
 ##Dominios permitidos para CORS
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Dominio del frontend (Vite)
-    "http://127.0.0.1:5173",  # Otra posible URL del frontend
+    "http://localhost",
+    "http://localhost:80",
+    "http://127.0.0.1",
+    "http://127.0.0.1:80",
+    "http://frontend:80",
+    "http://frontend:4173"
 ]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]
+CSRF_TRUSTED_ORIGINS = [ "http://localhost",
+    "http://localhost:80",
+    "http://127.0.0.1",
+    "http://127.0.0.1:80",
+    "http://frontend:80",
+    "http://frontend:4173"]
 
 
 ROOT_URLCONF = 'Cliento.urls'

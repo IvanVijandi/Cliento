@@ -6,45 +6,40 @@ from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.models import User 
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from django.http import JsonResponse
-from django.middleware.csrf import get_token
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.utils.decorators import method_decorator
 
 
 ##Clases de Vista viewsets | son como los controladores de Django pero para API REST
 ##Ya nos da PUT/DELETE/GET/POST
 
 ##VISTAS PARA LOS MODELOS
-class Profesional(viewsets.ModelViewSet):
+class ProfesionalView(viewsets.ModelViewSet):
     queryset = Profesional.objects.all()
     serializer_class = ProfesionalSerializer
     permission_classes = [IsAuthenticated]
 
-class Consultorio(viewsets.ModelViewSet):
+class ConsultorioView(viewsets.ModelViewSet):
     queryset = Consultorio.objects.all()
     serializer_class = ConsultorioSerializer
     permission_classes = [IsAuthenticated]
 
-class Paciente(viewsets.ModelViewSet):
+class PacienteView(viewsets.ModelViewSet):
     queryset = Paciente.objects.all()
     serializer_class = PacienteSerializer
     permission_classes = [IsAuthenticated]
 
-class Consulta(viewsets.ModelViewSet):
+class ConsultaView(viewsets.ModelViewSet):
     queryset = Consulta.objects.all()
     serializer_class = ConsultaSerializer
     permission_classes = [IsAuthenticated]
 
 
-class Nota(viewsets.ModelViewSet):
+class NotaView(viewsets.ModelViewSet):
     queryset = Nota.objects.all()
     serializer_class = NotaSerializer
     permission_classes = [IsAuthenticated]
 
 
 ##VISTA DE AUTENTICACION
-
 class RegisterView(APIView):
     def post(self, request):
         data = request.data
@@ -71,7 +66,6 @@ class RegisterView(APIView):
             return Response({"error": "La matrícula ya está en uso"}, status=400)
         
         Profesional.objects.create(user=user, matricula=matricula, nombre=name, apellido=apellido)
-
 
         
         return Response({"message": "Usuario creado exitosamente"}, status=201)

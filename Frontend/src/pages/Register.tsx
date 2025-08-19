@@ -12,6 +12,7 @@ import Button from '../components/ui/Button';
 
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
+console.log( API_BASE_URL);
 
 // Define schema for form validation
 const registerSchema = z.object({
@@ -19,7 +20,8 @@ const registerSchema = z.object({
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string()
+  confirmPassword: z.string(),
+  matricula: z.string().min(1, 'Matricula is required') // <-- nuevo campo
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword']
@@ -31,6 +33,7 @@ type RegisterFormData = {
   email: string;
   password: string;
   confirmPassword: string;
+  matricula: string; // <-- nuevo campo
 };
 
 const Register: React.FC = () => {
@@ -68,21 +71,28 @@ const Register: React.FC = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      // Simulating API call
-      console.log('Registration data:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Store user data in localStorage (in a real app, you would use tokens)
-      localStorage.setItem('user', JSON.stringify({
-        id: '1',
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: 'practitioner'
-      }));
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
+      const response = await fetch(`${API_BASE_URL}/register/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          name: data.firstName,
+          apellido: data.lastName,
+          matricula: data.matricula // <-- aquí lo envías
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        navigate('/dashboard');
+      } else {
+        alert(result.error || "Registration failed. Please try again.");
+      }
     } catch (error) {
       console.error('Registration error:', error);
       alert('Registration failed. Please try again.');
@@ -228,6 +238,15 @@ const Register: React.FC = () => {
                   )}
                 </button>
               </div>
+              
+              <Input
+                label="Matricula"
+                type="text"
+                id="matricula"
+                placeholder="1234"
+                error={errors.matricula?.message}
+                {...register('matricula')}
+              />
               
               <div>
                 <div className="flex items-start">
