@@ -16,8 +16,6 @@ services:
   backend:
     image: ivan75/cliento_backend:latest
     container_name: cliento_backend
-    volumes:
-      - ./Backend/Cliento:/app
     environment:
       - DJANGO_SETTINGS_MODULE=Cliento.settings
       - POSTGRES_DB=${POSTGRES_DB}          
