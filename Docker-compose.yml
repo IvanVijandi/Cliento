@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
   frontend:
-    build: ./Frontend
+    image: ivan75/cliento_frontend:latest
     container_name: cliento_frontend
     ports:
       - "80:4173" ## apunto el puerto 80 de la MV al puerto 4173 del contenedor
@@ -14,7 +14,7 @@ services:
 
   # Backend Django
   backend:
-    build: ./Backend/Cliento
+    image: ivan75/cliento_backend:latest
     container_name: cliento_backend
     volumes:
       - ./Backend/Cliento:/app
