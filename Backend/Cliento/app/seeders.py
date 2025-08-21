@@ -9,7 +9,7 @@ def run():
 
     # Crear profesionales (solo con los campos que existen en el modelo)
     profesional1 = Profesional.objects.create(
-        userser=user1, 
+        user=user1, 
         nombre="Juan", 
         apellido="Pérez", 
         matricula="12345"
