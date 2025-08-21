@@ -52,23 +52,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 ##Host
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["http://4.228.225.47:80"]
 ##Dominios permitidos para CORS
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost",
-    "http://localhost:80",
-    "http://127.0.0.1",
-    "http://127.0.0.1:80",
-    "http://frontend:80",
-    "http://frontend:4173"
+    "http://4.228.225.47:80"
 ]
-CSRF_TRUSTED_ORIGINS = [ "http://localhost",
-    "http://localhost:80",
-    "http://127.0.0.1",
-    "http://127.0.0.1:80",
-    "http://frontend:80",
-    "http://frontend:4173"]
+CSRF_TRUSTED_ORIGINS = [ "http://4.228.225.47:80"]
 
 
 ROOT_URLCONF = 'Cliento.urls'
